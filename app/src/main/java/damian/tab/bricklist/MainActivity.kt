@@ -1,5 +1,7 @@
 package damian.tab.bricklist
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -15,11 +17,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-
         fab.setOnClickListener { view ->
+            val sharedPreferences = getSharedPreferences(SETTINGS_NAME, SETTINGS_MODE)
+            println(sharedPreferences.getBoolean(SHOW_ARCHIVED_FIELD, false))
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -28,7 +32,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        println(item.itemId)
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE)
         return super.onOptionsItemSelected(item)
     }
 }
