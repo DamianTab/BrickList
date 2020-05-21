@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
+import damian.tab.bricklist.database.DatabaseManager
+import damian.tab.bricklist.database.SQLExecutor
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -18,9 +20,10 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         add_button.setOnClickListener {
-            startActivityForResult(Intent(this, NewInventoryActivity::class.java), REQUEST_CODE)
+//            startActivityForResult(Intent(this, NewInventoryActivity::class.java), REQUEST_CODE)
+            SQLExecutor(this).getInventories(false)
         }
-    }
+        }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
