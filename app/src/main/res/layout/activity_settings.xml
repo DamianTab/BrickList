@@ -40,7 +40,6 @@
         android:layout_height="48dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="http://fcds.cs.put.poznan.pl/MyWeb/BL/"
         android:textSize="16dp"
         app:layout_constraintBottom_toBottomOf="@id/archived_switch"
         app:layout_constraintEnd_toEndOf="parent"

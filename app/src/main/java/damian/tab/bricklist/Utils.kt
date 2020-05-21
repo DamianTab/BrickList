@@ -9,6 +9,7 @@ const val SETTINGS_NAME = "Settings_Data"
 const val SETTINGS_MODE = Context.MODE_PRIVATE
 const val DATABASE_URL_FIELD = "database_url"
 const val SHOW_ARCHIVED_FIELD = "show_archived"
+const val DEFAULT_DATABASE_URL = "http://fcds.cs.put.poznan.pl/MyWeb/BL/"
 
 inline fun SharedPreferences.apply(action: SharedPreferences.Editor.() -> Unit){
     val editor = this.edit()
