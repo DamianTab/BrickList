@@ -26,7 +26,7 @@ class DatabaseManager(private val context: Context) :
         if (isDatabaseOutdated()) {
             context.deleteDatabase(DATABASE_NAME)
             installDatabaseFromAssets()
-            sharedPreferences.apply { putInt(DATABASE_NAME, DATABASE_VERSION) }
+            sharedPreferences.apply { putInt(DATABASE_VERSION_FIELD, DATABASE_VERSION) }
         }
     }
 

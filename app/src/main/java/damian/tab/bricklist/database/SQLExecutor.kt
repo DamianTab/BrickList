@@ -11,7 +11,8 @@ object SQLExecutor {
         databaseManager = DatabaseManager(context)
     }
 
-    fun getInventories(showArchived: Boolean = false){
+    fun getInventories(showArchived: Boolean = false): List<Inventory> {
+        val inventories = ArrayList<Inventory>()
         println("---------------------------------")
         val myDatabase = databaseManager!!.readableDatabase
         var query = "SELECT * FROM Inventories"
@@ -19,8 +20,9 @@ object SQLExecutor {
         val cursor = myDatabase.rawQuery(query, null)
         while(cursor.moveToNext()){
             val inventory = Inventory().parse(cursor)
-            println(inventory.name)
+            inventories.add(inventory)
         }
         println("---------------------------------")
+        return inventories
     }
 }
