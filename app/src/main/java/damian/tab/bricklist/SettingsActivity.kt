@@ -3,6 +3,7 @@ package damian.tab.bricklist
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : AppCompatActivity() {
@@ -20,6 +21,7 @@ class SettingsActivity : AppCompatActivity() {
         sharedPreferences.apply { putString(DATABASE_URL_FIELD, url_input.text.toString()) }
         sharedPreferences.apply { putBoolean(SHOW_ARCHIVED_FIELD, archived_switch.isChecked) }
         setResult(Activity.RESULT_OK,intent)
+        Toast.makeText(this, "Settings saved !", Toast.LENGTH_SHORT).show()
         super.finish()
     }
 }
