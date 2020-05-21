@@ -1,21 +1,26 @@
 package damian.tab.bricklist.database
 
 import android.content.Context
+import damian.tab.bricklist.domain.Inventory
 
-class SQLExecutor(private val context: Context) {
+object SQLExecutor {
 
-    private val databaseManager = DatabaseManager(context)
+    private var databaseManager: DatabaseManager? = null
 
-    fun getInventories(showInactive: Boolean = false){
-        val myDatabase = databaseManager.readableDatabase
-        val cursor = myDatabase.rawQuery("SELECT * FROM Inventories;", null)
+    fun initialize(context: Context){
+        databaseManager = DatabaseManager(context)
+    }
+
+    fun getInventories(showArchived: Boolean = false){
+        println("---------------------------------")
+        val myDatabase = databaseManager!!.readableDatabase
+        var query = "SELECT * FROM Inventories"
+        query += if (showArchived) ";" else  " WHERE ACTIVE=1;"
+        val cursor = myDatabase.rawQuery(query, null)
         while(cursor.moveToNext()){
-            var id= cursor.getInt(0)
-            val name = cursor.getString(1)
-            val ac = cursor.getInt(2)
-            val la = cursor.getInt(3)
-            println(name)
+            val inventory = Inventory().parse(cursor)
+            println(inventory.name)
         }
-        println("ZAKONCZYLOOO")
+        println("---------------------------------")
     }
 }

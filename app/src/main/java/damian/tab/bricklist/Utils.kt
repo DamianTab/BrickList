@@ -2,6 +2,10 @@ package damian.tab.bricklist
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
+import androidx.annotation.RequiresApi
+import java.text.SimpleDateFormat
+import java.util.*
 
 // Main
 const val REQUEST_CODE = 1000
@@ -21,4 +25,11 @@ inline fun SharedPreferences.apply(action: SharedPreferences.Editor.() -> Unit){
     val editor = this.edit()
     action.invoke(editor)
     editor.apply()
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun getTodayDate(): Int {
+    val date = Date()
+    val simpleDateFormat = SimpleDateFormat("yyyyMMdd")
+    return simpleDateFormat.format(date).toInt()
 }
