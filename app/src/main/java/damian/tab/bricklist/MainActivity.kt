@@ -1,16 +1,21 @@
 package damian.tab.bricklist
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.ArrayAdapter
+import android.view.*
+import android.widget.BaseAdapter
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import damian.tab.bricklist.adapter.InventoryListAdapter
 import damian.tab.bricklist.database.SQLExecutor
+import damian.tab.bricklist.domain.Inventory
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -47,20 +52,13 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if ((requestCode == REQUEST_CODE) && (resultCode == Activity.RESULT_OK)) updateList()
+        println("UPDATEEEEEEEEEEEEEE")
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun updateList() {
         val showArchived = sharedPreferences.getBoolean(SHOW_ARCHIVED_FIELD, DEFAULT_ARCHIVED_VALUE)
         val inventories = SQLExecutor.getInventories(showArchived)
-        projects.adapter =
-            ArrayAdapter(this, android.R.layout.simple_list_item_1, inventories.map { it.name })
-        projects.setOnItemClickListener { _, _, position, _ -> listViewOnClick(position); }
-    }
-
-    private fun listViewOnClick(position: Int) {
-        println(position)
-//        var intent = Intent(this,ProjectActivity::class.java);
-//        startActivity(intent)
+        projects.adapter = InventoryListAdapter(this, inventories)
     }
 }

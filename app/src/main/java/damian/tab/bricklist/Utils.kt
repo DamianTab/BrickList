@@ -23,6 +23,10 @@ const val ASSETS_PATH = "databases"
 const val DATABASE_NAME = "BrickList.db"
 const val DATABASE_VERSION = 1
 
+//Intent data
+const val INVENTORY_DATA = "inventory_data"
+
+
 inline fun SharedPreferences.apply(action: SharedPreferences.Editor.() -> Unit){
     val editor = this.edit()
     action.invoke(editor)
