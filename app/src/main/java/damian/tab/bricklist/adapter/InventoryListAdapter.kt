@@ -10,9 +10,9 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import damian.tab.bricklist.INVENTORY_DATA
+import damian.tab.bricklist.InventoryPropertiesActivity
 import damian.tab.bricklist.MainActivity
 import damian.tab.bricklist.REQUEST_CODE
-import damian.tab.bricklist.SettingsActivity
 import damian.tab.bricklist.domain.Inventory
 
 class InventoryListAdapter(
@@ -50,8 +50,8 @@ class InventoryListAdapter(
 
         nameTextView.setOnClickListener {
             val selectedInventory = this.inventoriesList[position]
-            val intent = Intent(context, SettingsActivity::class.java)
-            intent.putExtra(INVENTORY_DATA, selectedInventory.toString())
+            val intent = Intent(context, InventoryPropertiesActivity::class.java)
+            intent.putExtra(INVENTORY_DATA, selectedInventory)
             (context as MainActivity).startActivityForResult(intent, REQUEST_CODE)
         }
         return rowView

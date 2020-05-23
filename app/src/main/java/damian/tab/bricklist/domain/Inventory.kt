@@ -1,8 +1,9 @@
 package damian.tab.bricklist.domain
 
 import android.database.Cursor
+import java.io.Serializable
 
-class Inventory : SQLParser {
+class Inventory : SQLParser, Serializable {
 
     var id: Int = -1
     var name: String = ""
