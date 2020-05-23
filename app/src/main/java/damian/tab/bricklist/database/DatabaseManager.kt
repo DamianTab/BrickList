@@ -14,30 +14,24 @@ class DatabaseManager(private val context: Context) :
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences(SETTINGS_NAME, SETTINGS_MODE)
 
-
     override fun onCreate(db: SQLiteDatabase?) {
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
     }
 
-    @Synchronized
+    override fun getReadableDatabase(): SQLiteDatabase {
+        installOrUpdateIfNecessary()
+        return super.getReadableDatabase()
+    }
+
     private fun installOrUpdateIfNecessary() {
         if (isDatabaseOutdated()) {
+            println("--------------------------------- Install database")
             context.deleteDatabase(DATABASE_NAME)
             installDatabaseFromAssets()
             sharedPreferences.apply { putInt(DATABASE_VERSION_FIELD, DATABASE_VERSION) }
         }
-    }
-
-    override fun getWritableDatabase(): SQLiteDatabase {
-        installOrUpdateIfNecessary()
-        return super.getWritableDatabase()
-    }
-
-    override fun getReadableDatabase(): SQLiteDatabase {
-        installOrUpdateIfNecessary()
-        return super.getReadableDatabase()
     }
 
     private fun installDatabaseFromAssets() {
@@ -56,6 +50,6 @@ class DatabaseManager(private val context: Context) :
 
 
     private fun isDatabaseOutdated(): Boolean {
-        return sharedPreferences.getInt(DATABASE_NAME, 0) < DATABASE_VERSION
+        return sharedPreferences.getInt(DATABASE_VERSION_FIELD, 0) < DATABASE_VERSION
     }
 }

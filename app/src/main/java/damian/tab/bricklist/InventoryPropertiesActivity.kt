@@ -1,45 +1,66 @@
 package damian.tab.bricklist
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
+import damian.tab.bricklist.database.SQLExecutor
 import damian.tab.bricklist.domain.Inventory
 
 class InventoryPropertiesActivity : AppCompatActivity() {
 
-    private var inventory: Inventory? = null
+    private lateinit var inventory: Inventory
+    //todo usunac komentarze
+//    private lateinit var sharedPreferences : SharedPreferences
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inventory_properties)
-        inventory = intent.extras?.get(INVENTORY_DATA) as Inventory?
+        SQLExecutor.initialize(this)
+//        sharedPreferences = getSharedPreferences(SETTINGS_NAME, SETTINGS_MODE)
+        inventory = (intent.extras?.get(INVENTORY_DATA) as Inventory?)!!
         val menuBar = supportActionBar
-        menuBar!!.title = inventory!!.name
+        menuBar!!.title = inventory.name
         menuBar.subtitle = "Project Name"
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.inventory_properties_menu, menu)
-        val menuItem = menu!!.findItem(R.id.properties_archived_switch).actionView
-        val switch = menuItem.findViewById<Switch>(R.id.properties_archived_switch_supplier)
-        switch.isChecked = inventory!!.active == 0
+        val menuItemView = menu!!.findItem(R.id.properties_archived_switch).actionView
+        val switch = menuItemView.findViewById<Switch>(R.id.properties_archived_switch_supplier)
+        switch.isChecked = inventory.active == 0
+        switch.setOnClickListener {
+            SQLExecutor.updateInventoryStatus(inventory.id, switch.isChecked)
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.properties_archived_switch -> {
-            }
-
             R.id.properties_save_button -> {
-
+                save()
             }
             R.id.properties_export_button -> {
-
+                exportToXML()
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun finish() {
+        setResult(Activity.RESULT_OK, intent)
+        super.finish()
+    }
+
+    private fun save() {
+        println("SAVE")
+    }
+
+    private fun exportToXML() {
+        println("EXPORT")
+
     }
 }

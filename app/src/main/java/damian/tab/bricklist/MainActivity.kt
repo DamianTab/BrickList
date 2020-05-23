@@ -16,15 +16,15 @@ import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        SQLExecutor.initialize(this)
         sharedPreferences = getSharedPreferences(SETTINGS_NAME, SETTINGS_MODE)
+        SQLExecutor.initialize(this)
 
         add_button.setOnClickListener {
             startActivityForResult(Intent(this, NewInventoryActivity::class.java), REQUEST_CODE)
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if ((requestCode == REQUEST_CODE) && (resultCode == Activity.RESULT_OK)) updateList()
-        println("UPDATEEEEEEEEEEEEEE")
+        println("---------------------onActivityResult")
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
