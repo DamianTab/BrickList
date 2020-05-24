@@ -1,9 +1,11 @@
 package damian.tab.bricklist.domain
 
 import android.database.Cursor
+import android.graphics.Bitmap
 
 class InventoryPart : SQLParser {
 
+    //    Database
     var id: Int = -1
     var typeId: Int = -1
     var itemId: Int = -1
@@ -11,6 +13,14 @@ class InventoryPart : SQLParser {
     var quantityInStore: Int = -1
     var colorId: Int = -1
     var extra: Int = -1
+
+    //    Extra
+    var inventoryId: Int? = null
+    var designId: Int? = null
+    var name: String? = null
+    var color: String? = null
+    var image: Bitmap? = null
+
 
     override fun parse(cursor: Cursor): InventoryPart {
 
