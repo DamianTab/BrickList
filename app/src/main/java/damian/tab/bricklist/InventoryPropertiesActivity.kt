@@ -32,33 +32,27 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         val inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
         SQLExecutor.supplyPartsNames(inventoryParts)
         SQLExecutor.supplyPartsColors(inventoryParts)
-        SQLExecutor.supplyCodesAndImages(inventoryParts)
+        SQLExecutor.supplyDesignCodesAndImages(inventoryParts)
 
         inventoryParts.forEach { part ->
-            if (part.image == null && part.code != null) {
-                var url = URL("https://www.lego.com/service/bricks/5/2/" + part.code)
+            if (part.image == null) {
+                var url = URL("https://www.lego.com/service/bricks/5/2/" + part.designCode)
                 try {
                     url.openConnection().getInputStream().use {
                         part.image = BitmapFactory.decodeStream(it)
                     }
                     //todo zapisanie zdjecia do bazy danych
-
-                } catch (e: FileNotFoundException) {
+                } catch (e: Exception) {
                     url =
-                        if (part.colorId == -1) URL("https://www.bricklink.com/PL/" + part.code + ".jpg") else URL(
-                            "http://img.bricklink.com/P/" + part.colorId + "/" + part.code + ".jpg"
-                        )
+                        if (part.colorCode == null || part.colorCode == 0) URL("https://www.bricklink.com/PL/" + part.partCode + ".jpg")
+                        else URL("http://img.bricklink.com/P/" + part.colorCode + "/" + part.partCode + ".jpg")
                     try {
                         url.openConnection().getInputStream().use {
                             part.image = BitmapFactory.decodeStream(it)
                         }
-                        //todo zapisanie zdjecia do bazy danych
-
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
             }
         }

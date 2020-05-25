@@ -118,10 +118,11 @@ object SQLExecutor {
         parts.forEach {
             if (it.name == null) {
                 val database = databaseManager.readableDatabase
-                val query = "select Name from Parts where id=${it.itemId}"
+                val query = "select Name, Code from Parts where id=${it.itemId}"
                 val cursor = database.rawQuery(query, null)
                 if (cursor.moveToFirst()) {
                     it.name = cursor.getString(0)
+                    it.partCode = cursor.getString(1)
                 }
                 closeCursor(cursor)
             }
@@ -132,26 +133,26 @@ object SQLExecutor {
         parts.forEach {
             if (it.color == null) {
                 val database = databaseManager.readableDatabase
-                //todo byc moze colorCode zamiast colorId
-                val query = "select Name from Colors where id=\"${it.colorId}\""
+                val query = "select Name, Code from Colors where id=\"${it.colorId}\""
                 val cursor = database.rawQuery(query, null)
                 if (cursor.moveToFirst()) {
                     it.color = cursor.getString(0)
+                    it.colorCode = cursor.getInt(1)
                 }
                 closeCursor(cursor)
             }
         }
     }
 
-    fun supplyCodesAndImages(parts: List<InventoryPart>) {
+    fun supplyDesignCodesAndImages(parts: List<InventoryPart>) {
         parts.forEach {
-            if (it.code == null) {
+            if (it.designCode == null) {
                 val database = databaseManager.readableDatabase
                 val query =
                     "select Code from Codes where ColorID=${it.colorId} and ItemID=${it.itemId}"
                 val cursor = database.rawQuery(query, null)
                 if (cursor.moveToFirst()) {
-                    it.code = cursor.getInt(0)
+                    it.designCode = cursor.getInt(0)
                     closeCursor(cursor)
                     supplyImage(it)
                 }
@@ -161,7 +162,7 @@ object SQLExecutor {
 
     private fun supplyImage(part: InventoryPart) {
         val database = databaseManager.readableDatabase
-        val query = "select Image from Codes where Code=" + part.code + ";"
+        val query = "select Image from Codes where Code=" + part.designCode + ";"
         val cursor = database.rawQuery(query, null)
         if (cursor.moveToFirst()) {
             val blob = cursor.getBlob(0)

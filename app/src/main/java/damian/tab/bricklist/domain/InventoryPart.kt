@@ -18,7 +18,9 @@ class InventoryPart : SQLParser {
     //    Extra
     var name: String? = null
     var color: String? = null
-    var code: Int? = null
+    var partCode: String? = null
+    var colorCode: Int? = null
+    var designCode: Int? = null
     var image: Bitmap? = null
 
 
