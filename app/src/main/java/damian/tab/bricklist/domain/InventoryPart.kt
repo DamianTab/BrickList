@@ -25,12 +25,12 @@ class InventoryPart : SQLParser {
     override fun parse(cursor: Cursor): InventoryPart {
 
         this.id = cursor.getInt(0)
-        this.typeId = cursor.getInt(2)
-        this.itemId = cursor.getInt(3)
-        this.quantityInSet = cursor.getInt(4)
-        this.quantityInStore = cursor.getInt(5)
-        this.colorId = cursor.getInt(6)
-        this.extra = cursor.getInt(7)
+        this.typeId = cursor.getInt(1)
+        this.itemId = cursor.getInt(2)
+        this.quantityInSet = cursor.getInt(3)
+        this.quantityInStore = cursor.getInt(4)
+        this.colorId = cursor.getInt(5)
+        this.extra = cursor.getInt(6)
         return this
     }
 }

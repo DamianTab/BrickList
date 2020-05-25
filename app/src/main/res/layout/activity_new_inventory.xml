@@ -17,11 +17,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.435"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/id_input"
+        app:layout_constraintTop_toBottomOf="@+id/new_inventory_id"
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/new_inventory_check_button"
         android:layout_width="157dp"
         android:layout_height="56dp"
         android:text="check"
@@ -29,23 +29,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.145"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/name_input"
+        app:layout_constraintTop_toBottomOf="@+id/new_inventory_name"
         app:layout_constraintVertical_bias="0.032" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/new_inventory_add_button"
         android:layout_width="157dp"
         android:layout_height="56dp"
         android:text="add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintStart_toEndOf="@+id/button2"
-        app:layout_constraintTop_toBottomOf="@+id/name_input"
+        app:layout_constraintStart_toEndOf="@+id/new_inventory_check_button"
+        app:layout_constraintTop_toBottomOf="@+id/new_inventory_name"
         app:layout_constraintVertical_bias="0.032" />
 
     <EditText
-        android:id="@+id/name_input"
+        android:id="@+id/new_inventory_name"
         android:layout_width="326dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
@@ -60,7 +60,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <EditText
-        android:id="@+id/id_input"
+        android:id="@+id/new_inventory_id"
         android:layout_width="326dp"
         android:layout_height="50dp"
         android:layout_marginTop="10dp"

@@ -1,5 +1,6 @@
 package damian.tab.bricklist.database
 
+import android.content.ContentValues
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -8,6 +9,7 @@ import damian.tab.bricklist.domain.Inventory
 import damian.tab.bricklist.domain.InventoryPart
 import damian.tab.bricklist.domain.SQLParser
 import damian.tab.bricklist.getTodayDate
+import org.w3c.dom.NodeList
 
 object SQLExecutor {
 
@@ -17,8 +19,63 @@ object SQLExecutor {
         databaseManager = DatabaseManager(context)
     }
 
-
 //    Create Inventory
+
+    fun checkIfProjectExists(name: String?): Boolean {
+        val query = "SELECT COUNT(*) FROM Inventories WHERE Name LIKE \"$name\""
+        val db = databaseManager.readableDatabase
+        val cursor = db.rawQuery(query, null)
+        cursor.moveToFirst()
+        val result = cursor.getInt(0)
+        cursor.close()
+        return result != 0
+    }
+
+    fun addProject(inventory: Inventory) {
+        val database = databaseManager.writableDatabase
+        val values = ContentValues()
+        values.put("id", inventory.id)
+        values.put("Name", inventory.name)
+        values.put("Active", inventory.active)
+        values.put("LastAccessed", inventory.lastActivity)
+        database.insert("Inventories", null, values)
+    }
+
+    fun addInventoryPart(attributes: NodeList, inventory: Inventory) {
+        val database = databaseManager.writableDatabase
+        val values = ContentValues()
+        val typeId = getTypeId(attributes.item(1).textContent.toString().trim())
+        values.put("InventoryID", inventory.id)
+        values.put("TypeID", typeId)
+        values.put("ItemID", attributes.item(3).textContent.toString().trim())
+        values.put("QuantityInSet", Integer.parseInt(attributes.item(5).textContent.toString()))
+        values.put("ColorID", Integer.parseInt(attributes.item(7).textContent.toString()))
+        database.insert("InventoriesParts", null, values)
+    }
+
+    fun getLastInventoryId(): Int {
+        val query = "select max(id) from Inventories;"
+        val database = databaseManager.readableDatabase
+        val cursor = database.rawQuery(query, null)
+        var lastId = -1
+        if (cursor.moveToFirst()) {
+            lastId = cursor.getInt(0)
+        }
+        if (cursor != null && !cursor.isClosed) {
+            cursor.close()
+        }
+        return lastId
+    }
+
+    private fun getTypeId(typeCode: String) : Int {
+        val database = databaseManager.writableDatabase
+        val query = "SELECT id FROM ItemTypes WHERE code LIKE \"$typeCode\""
+        val cursor = database.rawQuery(query, null)
+        cursor.moveToFirst()
+        val toReturn = Integer.parseInt(cursor.getString(0))
+        cursor.close()
+        return toReturn
+    }
 
 
 //    Inventory -------------------------------------------------
@@ -48,14 +105,6 @@ object SQLExecutor {
 
 //    Inventory parts -------------------------------------------------
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun updateInventoryDate(inventoryId: Int) {
-        val query =
-            "update Inventories set LastAccessed=" + getTodayDate() + " where _id=" + inventoryId + ";"
-        execWritableQuery(query)
-    }
-
-
     //todo sprawdzic czy na pewno działa
     fun getInventoryParts(inventoryId: Int): ArrayList<InventoryPart> {
         val inventoryParts = ArrayList<SQLParser>()
@@ -66,6 +115,13 @@ object SQLExecutor {
             inventoryParts,
             InventoryPart::class.java
         ) as ArrayList<InventoryPart>
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateInventoryDate(inventoryId: Int) {
+        val query =
+            "update Inventories set LastAccessed=" + getTodayDate() + " where _id=" + inventoryId + ";"
+        execWritableQuery(query)
     }
 
 //        todo trzeba dodawac jeszcze id inventory
@@ -181,7 +237,7 @@ object SQLExecutor {
         query: String,
         resultList: ArrayList<SQLParser>,
         type: Class<T>
-    ): List<SQLParser> {
+    ): ArrayList<SQLParser> {
         val database = databaseManager.readableDatabase
         val cursor = database.rawQuery(query, null)
         while (cursor.moveToNext()) {
