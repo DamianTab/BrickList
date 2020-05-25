@@ -17,18 +17,18 @@ import damian.tab.bricklist.domain.Inventory
 
 class InventoryListAdapter(
     private val context: Context,
-    private val inventoriesList: List<Inventory>
+    private val inventories: List<Inventory>
 ) : BaseAdapter() {
 
     private var inflater: LayoutInflater =
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getCount(): Int {
-        return inventoriesList.size
+        return inventories.size
     }
 
     override fun getItem(position: Int): Inventory {
-        return inventoriesList[position]
+        return inventories[position]
     }
 
     override fun getItemId(position: Int): Long {
@@ -49,7 +49,7 @@ class InventoryListAdapter(
         }
 
         nameTextView.setOnClickListener {
-            val selectedInventory = this.inventoriesList[position]
+            val selectedInventory = this.inventories[position]
             val intent = Intent(context, InventoryPropertiesActivity::class.java)
             intent.putExtra(INVENTORY_DATA, selectedInventory)
             (context as MainActivity).startActivityForResult(intent, REQUEST_CODE)

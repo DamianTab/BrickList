@@ -12,19 +12,21 @@ import damian.tab.bricklist.domain.Inventory
 class InventoryPropertiesActivity : AppCompatActivity() {
 
     private lateinit var inventory: Inventory
-    //todo usunac komentarze
-//    private lateinit var sharedPreferences : SharedPreferences
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inventory_properties)
         SQLExecutor.initialize(this)
-//        sharedPreferences = getSharedPreferences(SETTINGS_NAME, SETTINGS_MODE)
         inventory = (intent.extras?.get(INVENTORY_DATA) as Inventory?)!!
         val menuBar = supportActionBar
         menuBar!!.title = inventory.name
         menuBar.subtitle = "Project Name"
+
+
+//        Read from database
+        val inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
+
+//        projects.adapter = InventoryPartListAdapter(this, inventories)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

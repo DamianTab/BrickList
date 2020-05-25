@@ -18,6 +18,7 @@ class Inventory : SQLParser, Serializable {
         this.lastActivity = date
     }
 
+
     override fun parse(cursor: Cursor): Inventory {
         id = cursor.getInt(0)
         name = cursor.getString(1)
