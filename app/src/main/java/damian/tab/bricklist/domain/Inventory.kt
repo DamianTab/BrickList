@@ -10,12 +10,14 @@ class Inventory : SQLParser, Serializable {
     var active: Int = 1
     var lastActivity: Int = 0
 
+    constructor()
     constructor(id: Int, name: String, active: Int, date: Int) {
         this.id = id
         this.name = name
         this.active = active
         this.lastActivity = date
     }
+
 
     override fun parse(cursor: Cursor): Inventory {
         id = cursor.getInt(0)

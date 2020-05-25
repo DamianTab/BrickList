@@ -78,7 +78,7 @@
         android:id="@+id/textView2"
         android:layout_width="326dp"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="Inventory ID"
         android:textSize="18sp"
         app:autoSizeTextType="none"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -86,6 +86,5 @@
         app:layout_constraintHorizontal_bias="0.435"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.047"
-        tools:text="Inventory ID" />
+        app:layout_constraintVertical_bias="0.047" />
 </androidx.constraintlayout.widget.ConstraintLayout>
