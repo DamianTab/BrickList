@@ -45,8 +45,6 @@ class NewInventoryActivity : AppCompatActivity() {
         val id = new_inventory_id.text.toString()
         val url =
             sharedPreferences.getString(DATABASE_URL_FIELD, DEFAULT_DATABASE_URL) + id + ".xml";
-
-        println(url)
         val task = AddNewProjectTask(this)
         task.execute(url)
     }

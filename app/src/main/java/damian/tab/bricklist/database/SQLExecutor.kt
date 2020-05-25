@@ -81,19 +81,11 @@ object SQLExecutor {
 //    Inventory -------------------------------------------------
 
     fun getInventories(showArchived: Boolean = false): List<Inventory> {
-        val inventories = ArrayList<Inventory>()
+        val inventories = ArrayList<SQLParser>()
         var query = "SELECT * FROM Inventories"
         query += if (showArchived) ";" else " WHERE ACTIVE=1;"
-        val database = databaseManager.readableDatabase
-        val cursor = database.rawQuery(query, null)
-        while (cursor.moveToNext()) {
-            val inventory = Inventory().parse(cursor)
-            inventories.add(inventory)
-        }
-        if (cursor != null && !cursor.isClosed) {
-            cursor.close()
-        }
-        return inventories
+        execReadableQuery(query, inventories, Inventory::class.java)
+        return inventories as ArrayList<Inventory>
     }
 
     fun updateInventoryStatus(id: Int, isArchived: Boolean) {
@@ -106,7 +98,7 @@ object SQLExecutor {
 //    Inventory parts -------------------------------------------------
 
     //todo sprawdzic czy na pewno działa
-    fun getInventoryParts(inventoryId: Int): ArrayList<InventoryPart> {
+    fun getInventoryParts(inventoryId: Int): List<InventoryPart> {
         val inventoryParts = ArrayList<SQLParser>()
         val query =
             "select id, TypeID, ItemID, QuantityInSet, QuantityInStore, ColorID, extra from InventoriesParts where InventoryID = $inventoryId"
