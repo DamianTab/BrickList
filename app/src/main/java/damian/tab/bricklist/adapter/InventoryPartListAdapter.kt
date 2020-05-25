@@ -39,36 +39,19 @@ class InventoryPartListAdapter(
         val nameTextView = rowView.findViewById(R.id.part_name) as TextView
         val quantityTextView = rowView.findViewById(R.id.part_quantity) as TextView
         val imageView = rowView.findViewById(R.id.part_image) as ImageView
-        val inventoryPart = getItem(position)
+        val part = getItem(position)
 
-        nameTextView.text = inventoryPart.name + "\n\n" + inventoryPart.color
-        quantityTextView.text = generateQuantityText(inventoryPart)
-        imageView.setImageBitmap(inventoryPart.image)
-
-//        if (inventoryPart.designId != null)
-//            Picasso.get()
-//                .load("https://www.lego.com/service/bricks/5/2/" + inventoryPart.designId.toString())
-//                .into(imageView, object : com.squareup.picasso.Callback {
-//                    override fun onSuccess() {
-//
-//                    }
-//
-//                    override fun onError(e: java.lang.Exception?) {
-//                        Picasso.get()
-//                            .load("http://img.bricklink.com/P/${inventoryPart.colorCode.toString()}/${inventoryPart.designId.toString()}.gif")
-//                            .into(imageView)
-//                    }
-//                })
-
+        nameTextView.text = part.name + "\n\n" + part.color
+        quantityTextView.text = generateQuantityText(part)
+        imageView.setImageBitmap(part.image)
 
         rowView.findViewById<FloatingActionButton>(R.id.plus_button).setOnClickListener {
-            changeQuantity(inventoryPart, quantityTextView, position, 1)
+            changeQuantity(part, quantityTextView, position, 1)
         }
         rowView.findViewById<FloatingActionButton>(R.id.minus_button).setOnClickListener {
-            changeQuantity(inventoryPart, quantityTextView, position, -1)
+            changeQuantity(part, quantityTextView, position, -1)
         }
-        changeRowColor(inventoryPart, quantityTextView)
-
+        changeRowColor(part, quantityTextView)
         return rowView
     }
 

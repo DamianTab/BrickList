@@ -32,7 +32,7 @@ class AddNewProjectTask(private var context: AppCompatActivity) : AsyncTask<Stri
                 return -1
             }
         } else {
-            if (SQLExecutor.checkIfProjectExists(arguments[1])) return -2
+            if (SQLExecutor.checkIfInventoryExists(arguments[1])) return -2
             try {
                 val url = URL(arguments[0])
                 val dbf: DocumentBuilderFactory = DocumentBuilderFactory.newInstance()
@@ -43,7 +43,7 @@ class AddNewProjectTask(private var context: AppCompatActivity) : AsyncTask<Stri
 
                 val newInventoryId = SQLExecutor.getLastInventoryId() + 1
                 val newInventory = Inventory(newInventoryId, arguments[1]!!, 1, getTodayDate())
-                SQLExecutor.addNewProject(newInventory)
+                SQLExecutor.addNewInventory(newInventory)
 
                 for (i in 0 until items.length) {
                     val node = items.item(i)

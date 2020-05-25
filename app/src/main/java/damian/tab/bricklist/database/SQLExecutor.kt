@@ -2,6 +2,8 @@ package damian.tab.bricklist.database
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
+import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.annotation.RequiresApi
 import damian.tab.bricklist.Factory
@@ -19,19 +21,19 @@ object SQLExecutor {
         databaseManager = DatabaseManager(context)
     }
 
-//    Create Inventory Activity -------------------------------------------------
+//    New Inventory Activity -------------------------------------------------
 
-    fun checkIfProjectExists(name: String?): Boolean {
+    fun checkIfInventoryExists(name: String?): Boolean {
         val query = "SELECT COUNT(*) FROM Inventories WHERE Name LIKE \"$name\""
         val db = databaseManager.readableDatabase
         val cursor = db.rawQuery(query, null)
         cursor.moveToFirst()
         val result = cursor.getInt(0)
-        cursor.close()
+        closeCursor(cursor)
         return result != 0
     }
 
-    fun addNewProject(inventory: Inventory) {
+    fun addNewInventory(inventory: Inventory) {
         val database = databaseManager.writableDatabase
         val values = ContentValues()
         values.put("id", inventory.id)
@@ -61,24 +63,21 @@ object SQLExecutor {
         if (cursor.moveToFirst()) {
             lastId = cursor.getInt(0)
         }
-        if (cursor != null && !cursor.isClosed) {
-            cursor.close()
-        }
+        closeCursor(cursor)
         return lastId
     }
 
-    private fun getTypeId(typeCode: String) : Int {
+    private fun getTypeId(typeCode: String): Int {
         val database = databaseManager.writableDatabase
         val query = "SELECT id FROM ItemTypes WHERE code LIKE \"$typeCode\""
         val cursor = database.rawQuery(query, null)
         cursor.moveToFirst()
         val toReturn = Integer.parseInt(cursor.getString(0))
-        cursor.close()
+        closeCursor(cursor)
         return toReturn
     }
 
-
-//    Inventory List Activity -------------------------------------------------
+//    Main Activity -------------------------------------------------
 
     fun getInventories(showArchived: Boolean = false): List<Inventory> {
         val inventories = ArrayList<SQLParser>()
@@ -95,12 +94,12 @@ object SQLExecutor {
         execWritableQuery(query)
     }
 
-//    Inventory Parts Activity -------------------------------------------------
+//    Inventory Properties Activity -------------------------------------------------
 
     fun getInventoryParts(inventoryId: Int): List<InventoryPart> {
         val inventoryParts = ArrayList<SQLParser>()
         val query =
-            "select id, TypeID, ItemID, QuantityInSet, QuantityInStore, ColorID, extra from InventoriesParts where InventoryID = $inventoryId"
+            "SELECT * from InventoriesParts where InventoryID = $inventoryId"
         return execReadableQuery(
             query,
             inventoryParts,
@@ -111,119 +110,69 @@ object SQLExecutor {
     @RequiresApi(Build.VERSION_CODES.O)
     fun updateInventoryDate(inventoryId: Int) {
         val query =
-            "update Inventories set LastAccessed=" + getTodayDate() + " where _id=" + inventoryId + ";"
+            "update Inventories set LastAccessed=" + getTodayDate() + " where id=" + inventoryId + ";"
         execWritableQuery(query)
     }
 
-//        todo trzeba dodawac jeszcze id inventory
+    fun supplyPartsNames(parts: List<InventoryPart>) {
+        parts.forEach {
+            if (it.name == null) {
+                val database = databaseManager.readableDatabase
+                val query = "select Name from Parts where id=${it.itemId}"
+                val cursor = database.rawQuery(query, null)
+                if (cursor.moveToFirst()) {
+                    it.name = cursor.getString(0)
+                }
+                closeCursor(cursor)
+            }
+        }
+    }
 
-//    fun getItemsIds(parts: ArrayList<InventoryPart>): ArrayList<InventoryPart>{
-//        parts.forEach {
-//            val query = "select _id from Parts where Code=\"${it.code}\""
-//            val db = this.readableDatabase
-//            val cursor = db.rawQuery(query, null)
-//            if(cursor.moveToFirst()) {
-//                it.itemId = cursor.getInt(0)
-//            } else {
-//                it.itemId = -9
-//            }
-//            if (cursor != null && !cursor.isClosed) {
-//                cursor.close()
-//            }
-//        }
-//        return parts
-//    }
-//
-//    fun getItemsColors(parts: ArrayList<InventoryPart>): ArrayList<InventoryPart>{
-//        parts.forEach {
-//            val query = "select Name from Colors where Code=\"${it.colorCode}\""
-//            val db = this.readableDatabase
-//            val cursor = db.rawQuery(query, null)
-//            if(cursor.moveToFirst()) {
-//                it.color = cursor.getString(0)
-//            }
-//            if (cursor != null && !cursor.isClosed) {
-//                cursor.close()
-//            }
-//        }
-//        return parts
-//    }
-//
-//    fun getItemImage(part: InventoryPart): InventoryPart {
-//        val query = "select Image from Codes where Code=" + part.designId + ";"
-//        val db = this.readableDatabase
-//        val cursor = db.rawQuery(query, null)
-//        val blob: ByteArray?
-//        if (cursor.moveToFirst()) {
-//            blob = cursor.getBlob(0)
-//            if (blob != null) {
-//                part.image = BitmapFactory.decodeByteArray(blob, 0, blob.size)
-//            }
-//        }
-//        if (cursor != null && !cursor.isClosed) {
-//            cursor.close()
-//        }
-//        return part
-//    }
-//
-//    private fun checkIfDesignIDExists(color: Int, itemId: Int): Boolean {
-//        val db = this.readableDatabase
-//        val query = "select Code from Codes where ColorID=$color and ItemID=$itemId"
-//        val cursor = db.rawQuery(query, null)
-//        if (cursor.count <= 0) {
-//            cursor.close()
-//            return false
-//        }
-//        if (cursor != null && !cursor.isClosed) {
-//            cursor.close()
-//        }
-//        return true
-//    }
-//
-//    fun getItemsDesignIds(parts: ArrayList<InventoryPart>): ArrayList<InventoryPart>{
-//        parts.forEach {
-//            if (checkIfDesignIDExists(it.colorCode!!, it.itemId!!)) {
-//                val query = "select Code from Codes where ColorID=${it.colorCode} and ItemID=${it.itemId}"
-//                val db = this.readableDatabase
-//                val cursor = db.rawQuery(query, null)
-//                if(cursor.moveToFirst()) {
-//                    it.designId = cursor.getInt(0)
-//                }
-//                if (cursor != null && !cursor.isClosed) {
-//                    cursor.close()
-//                }
-//            }
-//        }
-//        return parts
-//    }
-//
-//    fun getItemsNames(parts: ArrayList<InventoryPart>): ArrayList<InventoryPart>{
-//        parts.forEach {
-//            val query = "select Name from Parts where _id=${it.itemId}"
-//            val db = this.readableDatabase
-//            val cursor = db.rawQuery(query, null)
-//            if(cursor.moveToFirst()) {
-//                it.name = cursor.getString(0)
-//            }
-//            if (cursor != null && !cursor.isClosed) {
-//                cursor.close()
-//            }
-//        }
-//        return parts
-//    }
-//
-//    fun updateQuantityInStore(inventoryId: String, parts: ArrayList<InventoryPart>){
-//        parts.forEach {
-//            val db = this.writableDatabase
-//            db.beginTransaction()
-//            val query = "update InventoriesParts set QuantityInStore=" + it.quantityInStore + " where InventoryID=" + inventoryId + " and _id=" + it.id+ ";"
-//            writableDatabase.execSQL(query)
-//            writableDatabase.setTransactionSuccessful()
-//            writableDatabase.endTransaction()
-//        }
-//    }
+    fun supplyPartsColors(parts: List<InventoryPart>) {
+        parts.forEach {
+            if (it.color == null) {
+                val database = databaseManager.readableDatabase
+                //todo byc moze colorCode zamiast colorId
+                val query = "select Name from Colors where id=\"${it.colorId}\""
+                val cursor = database.rawQuery(query, null)
+                if (cursor.moveToFirst()) {
+                    it.color = cursor.getString(0)
+                }
+                closeCursor(cursor)
+            }
+        }
+    }
 
+    fun supplyCodesAndImages(parts: List<InventoryPart>) {
+        parts.forEach {
+            if (it.code == null) {
+                val database = databaseManager.readableDatabase
+                val query =
+                    "select Code from Codes where ColorID=${it.colorId} and ItemID=${it.itemId}"
+                val cursor = database.rawQuery(query, null)
+                if (cursor.moveToFirst()) {
+                    it.code = cursor.getInt(0)
+                    closeCursor(cursor)
+                    supplyImage(it)
+                }
+            }
+        }
+    }
 
+    private fun supplyImage(part: InventoryPart) {
+        val database = databaseManager.readableDatabase
+        val query = "select Image from Codes where Code=" + part.code + ";"
+        val cursor = database.rawQuery(query, null)
+        if (cursor.moveToFirst()) {
+            val blob = cursor.getBlob(0)
+            if (blob != null) {
+                part.image = BitmapFactory.decodeByteArray(blob, 0, blob.size)
+            }
+        }
+        closeCursor(cursor)
+    }
+
+    //    ---------------------------------------------------
     private fun <T : SQLParser> execReadableQuery(
         query: String,
         resultList: ArrayList<SQLParser>,
@@ -235,9 +184,7 @@ object SQLExecutor {
             val instance = Factory(type).newInstance()
             resultList.add(instance.parse(cursor))
         }
-        if (cursor != null && !cursor.isClosed) {
-            cursor.close()
-        }
+        closeCursor(cursor)
         return resultList
     }
 
@@ -247,5 +194,11 @@ object SQLExecutor {
         database.execSQL(query)
         database.setTransactionSuccessful()
         database.endTransaction()
+    }
+
+    private fun closeCursor(cursor: Cursor) {
+        if (!cursor.isClosed) {
+            cursor.close()
+        }
     }
 }
