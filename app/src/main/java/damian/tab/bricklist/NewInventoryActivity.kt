@@ -1,20 +1,11 @@
 package damian.tab.bricklist
 
 import android.app.Activity
-import android.content.Intent
 import android.content.SharedPreferences
-import android.os.AsyncTask
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import damian.tab.bricklist.task.AddNewProjectTask
+import damian.tab.bricklist.task.DownloadXMLAsyncTask
 import kotlinx.android.synthetic.main.activity_new_inventory.*
-import org.w3c.dom.Document
-import org.xml.sax.InputSource
-import java.net.HttpURLConnection
-import java.net.URL
-import javax.xml.parsers.DocumentBuilder
-import javax.xml.parsers.DocumentBuilderFactory
 
 class NewInventoryActivity : AppCompatActivity() {
 
@@ -45,7 +36,7 @@ class NewInventoryActivity : AppCompatActivity() {
         val id = new_inventory_id.text.toString()
         val url =
             sharedPreferences.getString(DATABASE_URL_FIELD, DEFAULT_DATABASE_URL) + id + ".xml";
-        val task = AddNewProjectTask(this)
+        val task = DownloadXMLAsyncTask(this)
         task.execute(url)
     }
 
@@ -54,7 +45,7 @@ class NewInventoryActivity : AppCompatActivity() {
         val id = new_inventory_id.text.toString()
         val url =
             sharedPreferences.getString(DATABASE_URL_FIELD, DEFAULT_DATABASE_URL) + id + ".xml";
-        val task = AddNewProjectTask(this)
+        val task = DownloadXMLAsyncTask(this)
         task.execute(url, projectName)
     }
 }

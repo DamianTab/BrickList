@@ -1,20 +1,18 @@
 package damian.tab.bricklist
 
 import android.app.Activity
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Switch
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import damian.tab.bricklist.adapter.InventoryPartListAdapter
 import damian.tab.bricklist.database.SQLExecutor
 import damian.tab.bricklist.domain.Inventory
 import kotlinx.android.synthetic.main.activity_inventory_properties.*
-import java.io.FileNotFoundException
-import java.net.URL
 
 class InventoryPropertiesActivity : AppCompatActivity() {
 
@@ -29,32 +27,24 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         menuBar!!.title = inventory.name
         menuBar.subtitle = "Project Name"
 
-        val inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
+        //todo by nie sciagac na nowo tych czesci tylko je zapisywac w javie
+        var inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
         SQLExecutor.supplyPartsNames(inventoryParts)
         SQLExecutor.supplyPartsColors(inventoryParts)
         SQLExecutor.supplyDesignCodesAndImages(inventoryParts)
+        inventoryParts.filter {
+            it.itemId == -1
+        }.forEach {
+            //todo naprawic partCode - obecnie jest null
+            Toast.makeText(
+                this,
+                "There is no information about brick with ItemCode: ${it.partCode} and Color: ${it.color}",
+                Toast.LENGTH_LONG
+            ).show()
+        }
 
-        inventoryParts.forEach { part ->
-            if (part.image == null) {
-                var url = URL("https://www.lego.com/service/bricks/5/2/" + part.designCode)
-                try {
-                    url.openConnection().getInputStream().use {
-                        part.image = BitmapFactory.decodeStream(it)
-                    }
-                    //todo zapisanie zdjecia do bazy danych
-                } catch (e: Exception) {
-                    url =
-                        if (part.colorCode == null || part.colorCode == 0) URL("https://www.bricklink.com/PL/" + part.partCode + ".jpg")
-                        else URL("http://img.bricklink.com/P/" + part.colorCode + "/" + part.partCode + ".jpg")
-                    try {
-                        url.openConnection().getInputStream().use {
-                            part.image = BitmapFactory.decodeStream(it)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
+        inventoryParts = inventoryParts.filter {
+            it.itemId != -1
         }
 
         inventory_part_list.adapter = InventoryPartListAdapter(this, inventoryParts)

@@ -30,6 +30,11 @@ const val DATABASE_VERSION = 1
 //Intent data
 const val INVENTORY_DATA = "inventory_data"
 
+//Image URLs
+const val IMAGE_URL_1 = "https://www.lego.com/service/bricks/5/2/"
+const val IMAGE_URL_2 = "https://www.bricklink.com/PL/"
+const val IMAGE_URL_3 = "http://img.bricklink.com/P/"
+
 
 inline fun SharedPreferences.apply(action: SharedPreferences.Editor.() -> Unit) {
     val editor = this.edit()

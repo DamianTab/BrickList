@@ -15,7 +15,7 @@ import java.net.URL
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
-class AddNewProjectTask(private var context: AppCompatActivity) : AsyncTask<String, Void, Int>() {
+class DownloadXMLAsyncTask(private var context: AppCompatActivity) : AsyncTask<String, Void, Int>() {
 
     override fun onPreExecute() {}
 

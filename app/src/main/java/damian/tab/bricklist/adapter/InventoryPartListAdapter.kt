@@ -7,14 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.squareup.picasso.Picasso
+import damian.tab.bricklist.IMAGE_URL_1
+import damian.tab.bricklist.IMAGE_URL_2
+import damian.tab.bricklist.IMAGE_URL_3
 import damian.tab.bricklist.R
 import damian.tab.bricklist.domain.InventoryPart
+import damian.tab.bricklist.task.DownloadImageAsyncTask
 
 class InventoryPartListAdapter(
-    private val context: Context,
+    context: Context,
     private val inventoryParts: List<InventoryPart>
 ) : BaseAdapter() {
 
@@ -43,16 +48,38 @@ class InventoryPartListAdapter(
 
         nameTextView.text = part.name + "\n\n" + part.color
         quantityTextView.text = generateQuantityText(part)
-        imageView.setImageBitmap(part.image)
 
-        rowView.findViewById<FloatingActionButton>(R.id.plus_button).setOnClickListener {
+        if (part.image == null) {
+            loadLazyImagesForFirstTime(part, imageView)
+            val imageTask = DownloadImageAsyncTask(part)
+            imageTask.execute()
+        } else if (imageView.drawable == null) {
+            imageView.setImageBitmap(part.image)
+        }
+
+        rowView.findViewById<Button>(R.id.plus_button).setOnClickListener {
             changeQuantity(part, quantityTextView, position, 1)
         }
-        rowView.findViewById<FloatingActionButton>(R.id.minus_button).setOnClickListener {
+        rowView.findViewById<Button>(R.id.minus_button).setOnClickListener {
             changeQuantity(part, quantityTextView, position, -1)
         }
         changeRowColor(part, quantityTextView)
         return rowView
+    }
+
+    private fun loadLazyImagesForFirstTime(part: InventoryPart, imageView: ImageView){
+        Picasso.get().load(IMAGE_URL_1 + part.designCode.toString())
+            .into(imageView, object : com.squareup.picasso.Callback {
+                override fun onSuccess() {}
+
+                override fun onError(e: java.lang.Exception?) {
+                    val url =
+                        if (part.colorCode == null || part.colorCode == 0) IMAGE_URL_2 + part.partCode + ".jpg"
+                        else IMAGE_URL_3 + part.colorCode + "/" + part.partCode + ".jpg"
+
+                    Picasso.get().load(url).into(imageView)
+                }
+            })
     }
 
     private fun changeQuantity(
@@ -61,6 +88,7 @@ class InventoryPartListAdapter(
         position: Int,
         valueToAdd: Int
     ) {
+        //todo naprawic warunek dodawania i odejmowania
         if (inventoryPart.quantityInSet > inventoryPart.quantityInStore) {
             inventoryPart.quantityInStore += valueToAdd
         }
