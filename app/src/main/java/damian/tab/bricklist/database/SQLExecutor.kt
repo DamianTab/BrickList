@@ -19,7 +19,7 @@ object SQLExecutor {
         databaseManager = DatabaseManager(context)
     }
 
-//    Create Inventory
+//    Create Inventory Activity -------------------------------------------------
 
     fun checkIfProjectExists(name: String?): Boolean {
         val query = "SELECT COUNT(*) FROM Inventories WHERE Name LIKE \"$name\""
@@ -31,7 +31,7 @@ object SQLExecutor {
         return result != 0
     }
 
-    fun addProject(inventory: Inventory) {
+    fun addNewProject(inventory: Inventory) {
         val database = databaseManager.writableDatabase
         val values = ContentValues()
         values.put("id", inventory.id)
@@ -41,7 +41,7 @@ object SQLExecutor {
         database.insert("Inventories", null, values)
     }
 
-    fun addInventoryPart(attributes: NodeList, inventory: Inventory) {
+    fun addNewInventoryPart(attributes: NodeList, inventory: Inventory) {
         val database = databaseManager.writableDatabase
         val values = ContentValues()
         val typeId = getTypeId(attributes.item(1).textContent.toString().trim())
@@ -78,7 +78,7 @@ object SQLExecutor {
     }
 
 
-//    Inventory -------------------------------------------------
+//    Inventory List Activity -------------------------------------------------
 
     fun getInventories(showArchived: Boolean = false): List<Inventory> {
         val inventories = ArrayList<SQLParser>()
@@ -95,9 +95,8 @@ object SQLExecutor {
         execWritableQuery(query)
     }
 
-//    Inventory parts -------------------------------------------------
+//    Inventory Parts Activity -------------------------------------------------
 
-    //todo sprawdzic czy na pewno działa
     fun getInventoryParts(inventoryId: Int): List<InventoryPart> {
         val inventoryParts = ArrayList<SQLParser>()
         val query =

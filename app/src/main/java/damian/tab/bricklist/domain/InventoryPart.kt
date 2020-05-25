@@ -23,7 +23,6 @@ class InventoryPart : SQLParser {
 
 
     override fun parse(cursor: Cursor): InventoryPart {
-
         this.id = cursor.getInt(0)
         this.typeId = cursor.getInt(1)
         this.itemId = cursor.getInt(2)

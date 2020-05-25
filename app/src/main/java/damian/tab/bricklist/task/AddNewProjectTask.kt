@@ -43,11 +43,11 @@ class AddNewProjectTask(private var context: AppCompatActivity) : AsyncTask<Stri
 
                 val newInventoryId = SQLExecutor.getLastInventoryId() + 1
                 val newInventory = Inventory(newInventoryId, arguments[1]!!, 1, getTodayDate())
-                SQLExecutor.addProject(newInventory)
+                SQLExecutor.addNewProject(newInventory)
 
                 for (i in 0 until items.length) {
                     val node = items.item(i)
-                    SQLExecutor.addInventoryPart(node.childNodes, newInventory)
+                    SQLExecutor.addNewInventoryPart(node.childNodes, newInventory)
                 }
                 return 1
             } catch (e: Exception) {
@@ -67,6 +67,4 @@ class AddNewProjectTask(private var context: AppCompatActivity) : AsyncTask<Stri
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         if (result == 1) context.finish()
     }
-
-
 }
