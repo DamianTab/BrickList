@@ -67,7 +67,7 @@ class InventoryPartListAdapter(
         return rowView
     }
 
-    private fun loadLazyImagesForFirstTime(part: InventoryPart, imageView: ImageView){
+    private fun loadLazyImagesForFirstTime(part: InventoryPart, imageView: ImageView) {
         Picasso.get().load(IMAGE_URL_1 + part.designCode.toString())
             .into(imageView, object : com.squareup.picasso.Callback {
                 override fun onSuccess() {}
@@ -77,7 +77,14 @@ class InventoryPartListAdapter(
                         if (part.colorCode == null || part.colorCode == 0) IMAGE_URL_2 + part.partCode + ".jpg"
                         else IMAGE_URL_3 + part.colorCode + "/" + part.partCode + ".jpg"
 
-                    Picasso.get().load(url).into(imageView)
+                    Picasso.get().load(url).into(imageView, object : com.squareup.picasso.Callback {
+                        override fun onSuccess() {}
+
+                        override fun onError(e: java.lang.Exception?) {
+                            Thread.sleep(2000)
+                            if (part.image != null) imageView.setImageBitmap(part.image)
+                        }
+                    })
                 }
             })
     }
