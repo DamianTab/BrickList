@@ -106,6 +106,6 @@ class InventoryPartListAdapter(
     }
 
     private fun generateQuantityText(inventoryPart: InventoryPart): String {
-        return "\n      " + (inventoryPart.quantityInStore).toString() + " of " + inventoryPart.quantityInSet.toString()
+        return (inventoryPart.quantityInStore).toString() + " of " + inventoryPart.quantityInSet.toString()
     }
 }
