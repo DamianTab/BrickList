@@ -1,13 +1,18 @@
 package damian.tab.bricklist
 
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Switch
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import damian.tab.bricklist.adapter.InventoryPartListAdapter
 import damian.tab.bricklist.database.SQLExecutor
 import damian.tab.bricklist.domain.Inventory
+import kotlinx.android.synthetic.main.activity_inventory_properties.*
 
 class InventoryPropertiesActivity : AppCompatActivity() {
 
@@ -22,11 +27,27 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         menuBar!!.title = inventory.name
         menuBar.subtitle = "Project Name"
 
+        //todo by nie sciagac na nowo tych czesci tylko je zapisywac w javie
+        var inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
+        SQLExecutor.supplyPartsNames(inventoryParts)
+        SQLExecutor.supplyPartsColors(inventoryParts)
+        SQLExecutor.supplyDesignCodesAndImages(inventoryParts)
+        inventoryParts.filter {
+            it.itemId == -1
+        }.forEach {
+            //todo naprawic partCode - obecnie jest null
+            Toast.makeText(
+                this,
+                "There is no information about brick with ItemCode: ${it.partCode} and Color: ${it.color}",
+                Toast.LENGTH_LONG
+            ).show()
+        }
 
-//        Read from database
-        val inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
+        inventoryParts = inventoryParts.filter {
+            it.itemId != -1
+        }
 
-//        projects.adapter = InventoryPartListAdapter(this, inventories)
+        inventory_part_list.adapter = InventoryPartListAdapter(this, inventoryParts)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -40,6 +61,7 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.properties_save_button -> {
@@ -57,11 +79,15 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         super.finish()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun save() {
+        SQLExecutor.updateInventoryDate(inventory.id)
+        //todo dodać zapisywanie
         println("SAVE")
     }
 
     private fun exportToXML() {
+        //todo eksport do XML
         println("EXPORT")
 
     }

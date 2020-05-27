@@ -3,18 +3,25 @@ package damian.tab.bricklist.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.squareup.picasso.Picasso
+import damian.tab.bricklist.IMAGE_URL_1
+import damian.tab.bricklist.IMAGE_URL_2
+import damian.tab.bricklist.IMAGE_URL_3
 import damian.tab.bricklist.R
+import damian.tab.bricklist.database.SQLExecutor
 import damian.tab.bricklist.domain.InventoryPart
+import damian.tab.bricklist.task.DownloadImageAsyncTask
 
 class InventoryPartListAdapter(
-    private val context: Context,
+    context: Context,
     private val inventoryParts: List<InventoryPart>
 ) : BaseAdapter() {
 
@@ -39,37 +46,53 @@ class InventoryPartListAdapter(
         val nameTextView = rowView.findViewById(R.id.part_name) as TextView
         val quantityTextView = rowView.findViewById(R.id.part_quantity) as TextView
         val imageView = rowView.findViewById(R.id.part_image) as ImageView
-        val inventoryPart = getItem(position)
+        val part = getItem(position)
 
-        nameTextView.text = inventoryPart.name + "\n\n" + inventoryPart.color
-        quantityTextView.text = generateQuantityText(inventoryPart)
-        imageView.setImageBitmap(inventoryPart.image)
+        nameTextView.text = part.name + "\n\n" + part.color
+        quantityTextView.text = generateQuantityText(part)
 
-//        if (inventoryPart.designId != null)
-//            Picasso.get()
-//                .load("https://www.lego.com/service/bricks/5/2/" + inventoryPart.designId.toString())
-//                .into(imageView, object : com.squareup.picasso.Callback {
-//                    override fun onSuccess() {
-//
-//                    }
-//
-//                    override fun onError(e: java.lang.Exception?) {
-//                        Picasso.get()
-//                            .load("http://img.bricklink.com/P/${inventoryPart.colorCode.toString()}/${inventoryPart.designId.toString()}.gif")
-//                            .into(imageView)
-//                    }
-//                })
-
-
-        rowView.findViewById<FloatingActionButton>(R.id.plus_button).setOnClickListener {
-            changeQuantity(inventoryPart, quantityTextView, position, 1)
+        if (part.image == null) {
+            loadLazyImages(part, imageView)
+        } else if (imageView.drawable == null) {
+            imageView.setImageBitmap(part.image)
         }
-        rowView.findViewById<FloatingActionButton>(R.id.minus_button).setOnClickListener {
-            changeQuantity(inventoryPart, quantityTextView, position, -1)
-        }
-        changeRowColor(inventoryPart, quantityTextView)
 
+        rowView.findViewById<Button>(R.id.plus_button).setOnClickListener {
+            changeQuantity(part, quantityTextView, position, 1)
+        }
+        rowView.findViewById<Button>(R.id.minus_button).setOnClickListener {
+            changeQuantity(part, quantityTextView, position, -1)
+        }
+        changeRowColor(part, quantityTextView)
         return rowView
+    }
+
+    private fun loadLazyImages(part: InventoryPart, imageView: ImageView) {
+        Picasso.get().load(IMAGE_URL_1 + part.designCode.toString())
+            .into(imageView, object : com.squareup.picasso.Callback {
+                override fun onSuccess() {
+                    part.image = (imageView.drawable as BitmapDrawable).bitmap
+                    SQLExecutor.saveImageInBLOB(part)
+                }
+
+                override fun onError(e: java.lang.Exception?) {
+                    val url =
+                        if (part.colorCode == null || part.colorCode == 0) IMAGE_URL_2 + part.partCode + ".jpg"
+                        else IMAGE_URL_3 + part.colorCode + "/" + part.partCode + ".jpg"
+
+                    Picasso.get().load(url).into(imageView, object : com.squareup.picasso.Callback {
+                        override fun onSuccess() {
+//                            No design code so we can't save in database
+                            part.image = (imageView.drawable as BitmapDrawable).bitmap
+                        }
+
+                        override fun onError(e: java.lang.Exception?) {
+                            val imageTask = DownloadImageAsyncTask(part, imageView)
+                            imageTask.execute()
+                        }
+                    })
+                }
+            })
     }
 
     private fun changeQuantity(
@@ -78,12 +101,14 @@ class InventoryPartListAdapter(
         position: Int,
         valueToAdd: Int
     ) {
-        if (inventoryPart.quantityInSet > inventoryPart.quantityInStore) {
-            inventoryPart.quantityInStore += valueToAdd
+        inventoryPart.quantityInStore += valueToAdd
+        if (inventoryPart.quantityInStore < 0 || inventoryPart.quantityInStore > inventoryPart.quantityInSet) {
+            inventoryPart.quantityInStore -= valueToAdd
+        } else {
+            inventoryParts[position].quantityInStore = inventoryPart.quantityInStore
+            quantityTextView.text = generateQuantityText(inventoryPart)
+            changeRowColor(inventoryPart, quantityTextView)
         }
-        inventoryParts[position].quantityInStore = inventoryPart.quantityInStore
-        quantityTextView.text = generateQuantityText(inventoryPart)
-        changeRowColor(inventoryPart, quantityTextView)
     }
 
     private fun changeRowColor(inventoryPart: InventoryPart, quantityTextView: TextView) {
@@ -95,6 +120,6 @@ class InventoryPartListAdapter(
     }
 
     private fun generateQuantityText(inventoryPart: InventoryPart): String {
-        return "\n      " + (inventoryPart.quantityInStore).toString() + " of " + inventoryPart.quantityInSet.toString()
+        return (inventoryPart.quantityInStore).toString() + " of " + inventoryPart.quantityInSet.toString()
     }
 }
