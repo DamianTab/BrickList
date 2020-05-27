@@ -72,7 +72,7 @@ class InventoryPartListAdapter(
             .into(imageView, object : com.squareup.picasso.Callback {
                 override fun onSuccess() {
                     part.image = (imageView.drawable as BitmapDrawable).bitmap
-                    SQLExecutor.saveImageInBLOB(part)
+                    SQLExecutor.updateImageInBLOB(part)
                 }
 
                 override fun onError(e: java.lang.Exception?) {

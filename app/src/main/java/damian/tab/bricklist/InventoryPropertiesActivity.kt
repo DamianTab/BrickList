@@ -12,11 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import damian.tab.bricklist.adapter.InventoryPartListAdapter
 import damian.tab.bricklist.database.SQLExecutor
 import damian.tab.bricklist.domain.Inventory
+import damian.tab.bricklist.domain.InventoryPart
 import kotlinx.android.synthetic.main.activity_inventory_properties.*
 
 class InventoryPropertiesActivity : AppCompatActivity() {
 
     private lateinit var inventory: Inventory
+    private lateinit var inventoryParts: List<InventoryPart>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +32,7 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         println(inventory.lastAccess)
 
         //todo by nie sciagac na nowo tych czesci tylko je zapisywac w javie
-        var inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
+        inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
         SQLExecutor.supplyPartsNames(inventoryParts)
         SQLExecutor.supplyPartsColors(inventoryParts)
         SQLExecutor.supplyDesignCodesAndImages(inventoryParts)
@@ -82,9 +84,9 @@ class InventoryPropertiesActivity : AppCompatActivity() {
 
     private fun save() {
         SQLExecutor.updateInventoryStatusAndAccessDate(inventory)
-
-        //todo dodać zapisywanie
-        println("SAVE")
+        inventoryParts.forEach {
+            SQLExecutor.updateInventoryPart(it)
+        }
     }
 
     private fun exportToXML() {

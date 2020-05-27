@@ -5,8 +5,6 @@ import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
-import androidx.annotation.RequiresApi
 import damian.tab.bricklist.Factory
 import damian.tab.bricklist.domain.Inventory
 import damian.tab.bricklist.domain.InventoryPart
@@ -14,7 +12,6 @@ import damian.tab.bricklist.domain.SQLParser
 import damian.tab.bricklist.getTodayDate
 import org.w3c.dom.NodeList
 import java.io.ByteArrayOutputStream
-import kotlin.collections.ArrayList
 
 object SQLExecutor {
 
@@ -84,7 +81,7 @@ object SQLExecutor {
         val database = databaseManager.readableDatabase
         val cursor = database.rawQuery(query, null)
         var result = -1
-        if (cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             result = Integer.parseInt(cursor.getString(0))
         }
         closeCursor(cursor)
@@ -179,14 +176,20 @@ object SQLExecutor {
         closeCursor(cursor)
     }
 
-    fun saveImageInBLOB(part: InventoryPart) {
+    fun updateImageInBLOB(part: InventoryPart) {
         ByteArrayOutputStream().use {
             part.image!!.compress(Bitmap.CompressFormat.JPEG, 100, it)
             val database = databaseManager.writableDatabase
             val values = ContentValues()
             values.put("Image", it.toByteArray())
-            database.update("Codes", values, "Code=${part.designCode}" ,null)
+            database.update("Codes", values, "Code=${part.designCode}", null)
         }
+    }
+
+    fun updateInventoryPart(part: InventoryPart) {
+        val query =
+            "update InventoriesParts set QuantityInStore=" + part.quantityInStore + " WHERE InventoryID=" + part.inventoryId + " AND ItemID=" + part.itemId + " AND ColorID=" + part.colorId + ";"
+        execWritableQuery(query)
     }
 
     //    ---------------------------------------------------

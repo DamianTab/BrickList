@@ -19,7 +19,7 @@ class DownloadImageAsyncTask(
         var url = URL(IMAGE_URL_1 + part.designCode)
         try {
             downloadImage(url)
-            if (part.image != null) SQLExecutor.saveImageInBLOB(part)
+            if (part.image != null) SQLExecutor.updateImageInBLOB(part)
         } catch (e: Exception) {
             url =
                 if (part.colorCode == null || part.colorCode == 0) URL(IMAGE_URL_2 + part.partCode + ".jpg")
