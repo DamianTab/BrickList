@@ -27,6 +27,8 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         menuBar!!.title = inventory.name
         menuBar.subtitle = "Project Name"
 
+        println(inventory.lastAccess)
+
         //todo by nie sciagac na nowo tych czesci tylko je zapisywac w javie
         var inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
         SQLExecutor.supplyPartsNames(inventoryParts)
@@ -56,12 +58,11 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         val switch = menuItemView.findViewById<Switch>(R.id.properties_archived_switch_supplier)
         switch.isChecked = inventory.active == 0
         switch.setOnClickListener {
-            SQLExecutor.updateInventoryStatus(inventory.id, switch.isChecked)
+            inventory.active = if (switch.isChecked) 0 else 1
         }
         return super.onCreateOptionsMenu(menu)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.properties_save_button -> {
@@ -79,9 +80,9 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         super.finish()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun save() {
-        SQLExecutor.updateInventoryDate(inventory.id)
+        SQLExecutor.updateInventoryStatusAndAccessDate(inventory)
+
         //todo dodać zapisywanie
         println("SAVE")
     }

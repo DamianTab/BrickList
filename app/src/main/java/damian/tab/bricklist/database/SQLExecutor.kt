@@ -42,7 +42,7 @@ object SQLExecutor {
         values.put("id", inventory.id)
         values.put("Name", inventory.name)
         values.put("Active", inventory.active)
-        values.put("LastAccessed", inventory.lastActivity)
+        values.put("LastAccessed", inventory.lastAccess)
         database.insert("Inventories", null, values)
     }
 
@@ -101,12 +101,6 @@ object SQLExecutor {
         return inventories as ArrayList<Inventory>
     }
 
-    fun updateInventoryStatus(id: Int, isArchived: Boolean) {
-        val value = if (isArchived) 0 else 1
-        val query = "update Inventories set Active=$value where id=$id;"
-        execWritableQuery(query)
-    }
-
 //    Inventory Properties Activity -------------------------------------------------
 
     fun getInventoryParts(inventoryId: Int): List<InventoryPart> {
@@ -120,10 +114,9 @@ object SQLExecutor {
         ) as ArrayList<InventoryPart>
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun updateInventoryDate(inventoryId: Int) {
+    fun updateInventoryStatusAndAccessDate(inventory: Inventory) {
         val query =
-            "update Inventories set LastAccessed=" + getTodayDate() + " where id=" + inventoryId + ";"
+            "update Inventories set Active=" + inventory.active + ",LastAccessed=" + getTodayDate() + " where id=" + inventory.id + ";"
         execWritableQuery(query)
     }
 

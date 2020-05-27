@@ -42,11 +42,8 @@ inline fun SharedPreferences.apply(action: SharedPreferences.Editor.() -> Unit) 
     editor.apply()
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun getTodayDate(): Int {
-    val date = Date()
-    val simpleDateFormat = SimpleDateFormat("yyyyMMdd")
-    return simpleDateFormat.format(date).toInt()
+    return (System.currentTimeMillis() / 1000).toInt()
 }
 
 open class Factory<T: SQLParser>(private val type: Class<T>) {

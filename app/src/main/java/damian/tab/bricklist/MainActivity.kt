@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         println("---------------------onActivityResult")
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun updateList() {
         val showArchived = sharedPreferences.getBoolean(SHOW_ARCHIVED_FIELD, DEFAULT_ARCHIVED_VALUE)
         val inventories = SQLExecutor.getInventories(showArchived)

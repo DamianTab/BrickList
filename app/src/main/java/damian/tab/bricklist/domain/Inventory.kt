@@ -8,7 +8,7 @@ class Inventory : SQLParser, Serializable {
     var id: Int = -1
     var name: String = ""
     var active: Int = 1
-    var lastActivity: Int = 0
+    var lastAccess: Int = 0
 
     //todo dodac liste inventoryPart - jako optymalizacje - by nie pobierało za każdym razem
 
@@ -17,7 +17,7 @@ class Inventory : SQLParser, Serializable {
         this.id = id
         this.name = name
         this.active = active
-        this.lastActivity = date
+        this.lastAccess = date
     }
 
 
@@ -25,7 +25,7 @@ class Inventory : SQLParser, Serializable {
         id = cursor.getInt(0)
         name = cursor.getString(1)
         active = cursor.getInt(2)
-        lastActivity = cursor.getInt(3)
+        lastAccess = cursor.getInt(3)
         return this
     }
 

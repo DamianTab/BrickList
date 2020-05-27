@@ -19,7 +19,6 @@ class DownloadXMLAsyncTask(private var context: AppCompatActivity) : AsyncTask<S
 
     override fun onPreExecute() {}
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun doInBackground(vararg arguments: String?): Int {
         if (arguments.size == 1) {
             try {
