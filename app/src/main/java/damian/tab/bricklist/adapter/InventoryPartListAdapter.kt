@@ -3,6 +3,7 @@ package damian.tab.bricklist.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import damian.tab.bricklist.IMAGE_URL_1
 import damian.tab.bricklist.IMAGE_URL_2
 import damian.tab.bricklist.IMAGE_URL_3
 import damian.tab.bricklist.R
+import damian.tab.bricklist.database.SQLExecutor
 import damian.tab.bricklist.domain.InventoryPart
 import damian.tab.bricklist.task.DownloadImageAsyncTask
 
@@ -50,9 +52,7 @@ class InventoryPartListAdapter(
         quantityTextView.text = generateQuantityText(part)
 
         if (part.image == null) {
-            loadLazyImagesForFirstTime(part, imageView)
-            val imageTask = DownloadImageAsyncTask(part)
-            imageTask.execute()
+            loadLazyImages(part, imageView)
         } else if (imageView.drawable == null) {
             imageView.setImageBitmap(part.image)
         }
@@ -67,10 +67,13 @@ class InventoryPartListAdapter(
         return rowView
     }
 
-    private fun loadLazyImagesForFirstTime(part: InventoryPart, imageView: ImageView) {
+    private fun loadLazyImages(part: InventoryPart, imageView: ImageView) {
         Picasso.get().load(IMAGE_URL_1 + part.designCode.toString())
             .into(imageView, object : com.squareup.picasso.Callback {
-                override fun onSuccess() {}
+                override fun onSuccess() {
+                    part.image = (imageView.drawable as BitmapDrawable).bitmap
+                    SQLExecutor.saveImageInBLOB(part)
+                }
 
                 override fun onError(e: java.lang.Exception?) {
                     val url =
@@ -78,11 +81,14 @@ class InventoryPartListAdapter(
                         else IMAGE_URL_3 + part.colorCode + "/" + part.partCode + ".jpg"
 
                     Picasso.get().load(url).into(imageView, object : com.squareup.picasso.Callback {
-                        override fun onSuccess() {}
+                        override fun onSuccess() {
+//                            No design code so we can't save in database
+                            part.image = (imageView.drawable as BitmapDrawable).bitmap
+                        }
 
                         override fun onError(e: java.lang.Exception?) {
-                            Thread.sleep(2000)
-                            if (part.image != null) imageView.setImageBitmap(part.image)
+                            val imageTask = DownloadImageAsyncTask(part, imageView)
+                            imageTask.execute()
                         }
                     })
                 }
@@ -95,13 +101,14 @@ class InventoryPartListAdapter(
         position: Int,
         valueToAdd: Int
     ) {
-        //todo naprawic warunek dodawania i odejmowania
-        if (inventoryPart.quantityInSet > inventoryPart.quantityInStore) {
-            inventoryPart.quantityInStore += valueToAdd
+        inventoryPart.quantityInStore += valueToAdd
+        if (inventoryPart.quantityInStore < 0 || inventoryPart.quantityInStore > inventoryPart.quantityInSet) {
+            inventoryPart.quantityInStore -= valueToAdd
+        } else {
+            inventoryParts[position].quantityInStore = inventoryPart.quantityInStore
+            quantityTextView.text = generateQuantityText(inventoryPart)
+            changeRowColor(inventoryPart, quantityTextView)
         }
-        inventoryParts[position].quantityInStore = inventoryPart.quantityInStore
-        quantityTextView.text = generateQuantityText(inventoryPart)
-        changeRowColor(inventoryPart, quantityTextView)
     }
 
     private fun changeRowColor(inventoryPart: InventoryPart, quantityTextView: TextView) {

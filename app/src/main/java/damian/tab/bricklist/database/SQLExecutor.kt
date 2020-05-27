@@ -3,6 +3,7 @@ package damian.tab.bricklist.database
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -12,6 +13,7 @@ import damian.tab.bricklist.domain.InventoryPart
 import damian.tab.bricklist.domain.SQLParser
 import damian.tab.bricklist.getTodayDate
 import org.w3c.dom.NodeList
+import java.io.ByteArrayOutputStream
 import kotlin.collections.ArrayList
 
 object SQLExecutor {
@@ -100,7 +102,6 @@ object SQLExecutor {
     }
 
     fun updateInventoryStatus(id: Int, isArchived: Boolean) {
-        println("--------------------------------- Update status")
         val value = if (isArchived) 0 else 1
         val query = "update Inventories set Active=$value where id=$id;"
         execWritableQuery(query)
@@ -183,6 +184,16 @@ object SQLExecutor {
             }
         }
         closeCursor(cursor)
+    }
+
+    fun saveImageInBLOB(part: InventoryPart) {
+        ByteArrayOutputStream().use {
+            part.image!!.compress(Bitmap.CompressFormat.JPEG, 100, it)
+            val database = databaseManager.writableDatabase
+            val values = ContentValues()
+            values.put("Image", it.toByteArray())
+            database.update("Codes", values, "Code=${part.designCode}" ,null)
+        }
     }
 
     //    ---------------------------------------------------

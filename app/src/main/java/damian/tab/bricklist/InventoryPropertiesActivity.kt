@@ -82,10 +82,12 @@ class InventoryPropertiesActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun save() {
         SQLExecutor.updateInventoryDate(inventory.id)
+        //todo dodać zapisywanie
         println("SAVE")
     }
 
     private fun exportToXML() {
+        //todo eksport do XML
         println("EXPORT")
 
     }
