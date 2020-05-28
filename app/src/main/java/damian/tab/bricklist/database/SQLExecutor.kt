@@ -125,7 +125,7 @@ object SQLExecutor {
                 val cursor = database.rawQuery(query, null)
                 if (cursor.moveToFirst()) {
                     it.name = cursor.getString(0)
-                    it.partCode = cursor.getString(1)
+                    it.itemCode = cursor.getString(1)
                 }
                 closeCursor(cursor)
             }
@@ -190,6 +190,32 @@ object SQLExecutor {
         val query =
             "update InventoriesParts set QuantityInStore=" + part.quantityInStore + " WHERE InventoryID=" + part.inventoryId + " AND ItemID=" + part.itemId + " AND ColorID=" + part.colorId + ";"
         execWritableQuery(query)
+    }
+
+    fun getTypeCode(part: InventoryPart): String? {
+        val query = "SELECT Code FROM ItemTypes WHERE id=" + part.typeId +  ";"
+        return getCodeFromQuery(query)
+    }
+
+    fun getItemCode(part: InventoryPart): String? {
+        val query = "SELECT Code FROM Parts WHERE id=" + part.itemId +  ";"
+        return getCodeFromQuery(query)
+    }
+
+    fun getColorCode(part: InventoryPart): String? {
+        val query = "SELECT Code FROM Colors WHERE id=" + part.colorId +  ";"
+        return getCodeFromQuery(query)
+    }
+
+    private fun getCodeFromQuery(query: String): String? {
+        val database = databaseManager.readableDatabase
+        val cursor = database.rawQuery(query, null)
+        var result: String? = null
+        if (cursor.moveToFirst()) {
+            result = cursor.getString(0)
+        }
+        closeCursor(cursor)
+        return result
     }
 
     //    ---------------------------------------------------

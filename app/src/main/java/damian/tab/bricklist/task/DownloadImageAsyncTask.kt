@@ -22,8 +22,8 @@ class DownloadImageAsyncTask(
             if (part.image != null) SQLExecutor.updateImageInBLOB(part)
         } catch (e: Exception) {
             url =
-                if (part.colorCode == null || part.colorCode == 0) URL(IMAGE_URL_2 + part.partCode + ".jpg")
-                else URL(IMAGE_URL_3 + part.colorCode + "/" + part.partCode + ".jpg")
+                if (part.colorCode == null || part.colorCode == 0) URL(IMAGE_URL_2 + part.itemCode + ".jpg")
+                else URL(IMAGE_URL_3 + part.colorCode + "/" + part.itemCode + ".jpg")
             try {
 //              No design code so we can't save in database
                 downloadImage(url)

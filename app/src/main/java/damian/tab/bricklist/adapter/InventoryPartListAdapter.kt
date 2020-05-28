@@ -77,8 +77,8 @@ class InventoryPartListAdapter(
 
                 override fun onError(e: java.lang.Exception?) {
                     val url =
-                        if (part.colorCode == null || part.colorCode == 0) IMAGE_URL_2 + part.partCode + ".jpg"
-                        else IMAGE_URL_3 + part.colorCode + "/" + part.partCode + ".jpg"
+                        if (part.colorCode == null || part.colorCode == 0) IMAGE_URL_2 + part.itemCode + ".jpg"
+                        else IMAGE_URL_3 + part.colorCode + "/" + part.itemCode + ".jpg"
 
                     Picasso.get().load(url).into(imageView, object : com.squareup.picasso.Callback {
                         override fun onSuccess() {
