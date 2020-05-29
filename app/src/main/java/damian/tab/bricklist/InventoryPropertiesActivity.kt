@@ -38,10 +38,8 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         menuBar.subtitle = "Project Name"
 
         inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
-        SQLExecutor.supplyPartsNames(inventoryParts)
-        SQLExecutor.supplyPartsColors(inventoryParts)
+        SQLExecutor.supplyPartsNamesAndColors(inventoryParts)
         SQLExecutor.supplyDesignCodesAndImages(inventoryParts)
-
         val invalidPartsCount = inventoryParts.filter {
             it.itemId == -1
         }.count()
@@ -51,11 +49,9 @@ class InventoryPropertiesActivity : AppCompatActivity() {
             "There is no information about  $invalidPartsCount  brick in database !",
             Toast.LENGTH_LONG
         ).show()
-
         inventoryParts = inventoryParts.filter {
             it.itemId != -1
         }
-
         inventory_part_list.adapter = InventoryPartListAdapter(this, inventoryParts)
     }
 
@@ -118,17 +114,12 @@ class InventoryPropertiesActivity : AppCompatActivity() {
                 quantityNode.textContent = missingQuantity.toString()
                 itemNode.appendChild(quantityNode)
 
-                it.typeCode = SQLExecutor.getTypeCode(it)
                 typeNode.textContent = it.typeCode
                 itemNode.appendChild(typeNode)
 
-                it.itemCode = SQLExecutor.getItemCode(it)
                 idNode.textContent = it.itemCode
                 itemNode.appendChild(idNode)
 
-                val colorCodeString = SQLExecutor.getColorCode(it)
-                it.colorCode =
-                    if (colorCodeString == null) null else Integer.parseInt(colorCodeString)
                 colorNode.textContent = it.colorCode.toString()
                 itemNode.appendChild(colorNode)
 

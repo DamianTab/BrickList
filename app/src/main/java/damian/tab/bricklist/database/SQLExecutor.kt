@@ -109,62 +109,50 @@ object SQLExecutor {
         execWritableQuery(query)
     }
 
-    fun supplyPartsNames(parts: List<InventoryPart>) {
-        parts.map {
-            if (it.name == null) {
-                val database = databaseManager.readableDatabase
-                val query = "select Name, Code from Parts where id=${it.itemId}"
-                val cursor = database.rawQuery(query, null)
-                if (cursor.moveToFirst()) {
-                    it.name = cursor.getString(0)
-                    it.itemCode = cursor.getString(1)
-                }
-                closeCursor(cursor)
-            }
+    fun supplyPartsNamesAndColors(parts: List<InventoryPart>) {
+        val lambda = { part:InventoryPart, cursor: Cursor ->
+            part.name = cursor.getString(1)
+            part.itemCode = cursor.getString(2)
+            part.color = cursor.getString(3)
+            part.colorCode = cursor.getInt(4)
+            part.typeCode = cursor.getString(5)
         }
-    }
-
-    fun supplyPartsColors(parts: List<InventoryPart>) {
-        parts.map {
-            if (it.color == null) {
-                val database = databaseManager.readableDatabase
-                val query = "select Name, Code from Colors where id=\"${it.colorId}\""
-                val cursor = database.rawQuery(query, null)
-                if (cursor.moveToFirst()) {
-                    it.color = cursor.getString(0)
-                    it.colorCode = cursor.getInt(1)
-                }
-                closeCursor(cursor)
-            }
-        }
+        val inventoryId = parts[0].inventoryId
+        val query =
+            "select ip.id, p.Name, p.Code, c.Name, c.Code, it.code from InventoriesParts ip inner join Parts p on ip.itemId = p.id " +
+                    "inner join Colors c on ip.colorId = c.id inner join ItemTypes it on ip.typeId = it.id where ip.inventoryID = $inventoryId;"
+        supplyInventoryPartAttributes(parts, query, lambda)
     }
 
     fun supplyDesignCodesAndImages(parts: List<InventoryPart>) {
-        parts.map {
-            if (it.designCode == null) {
-                val database = databaseManager.readableDatabase
-                val query =
-                    "select Code from Codes where ColorID=${it.colorId} and ItemID=${it.itemId}"
-                val cursor = database.rawQuery(query, null)
-                if (cursor.moveToFirst()) {
-                    it.designCode = cursor.getInt(0)
-                    closeCursor(cursor)
-                    supplyImage(it)
-                }
-            }
-        }
-    }
-
-    private fun supplyImage(part: InventoryPart) {
-        val database = databaseManager.readableDatabase
-        val query = "select Image from Codes where Code=" + part.designCode + ";"
-        val cursor = database.rawQuery(query, null)
-        if (cursor.moveToFirst()) {
-            val blob = cursor.getBlob(0)
+        val lambda = { part:InventoryPart, cursor: Cursor ->
+            part.designCode = cursor.getInt(1)
+            val blob = cursor.getBlob(2)
             if (blob != null) {
                 part.image = BitmapFactory.decodeByteArray(blob, 0, blob.size)
             }
         }
+        val inventoryId = parts[0].inventoryId
+        val query =
+            "select ip.id, c.Code, c.Image from InventoriesParts ip inner join Codes c " +
+                    "on ip.itemId = c.itemId and ip.colorId = c.colorId where ip.inventoryID = $inventoryId;"
+        supplyInventoryPartAttributes(parts, query, lambda)
+    }
+
+    private fun supplyInventoryPartAttributes(parts: List<InventoryPart>, query:String, function: (InventoryPart, Cursor) -> Unit){
+        val database = databaseManager.readableDatabase
+        val cursor = database.rawQuery(query, null)
+        var counter = 0
+        while (cursor.moveToNext()) {
+            val selectedId = cursor.getInt(0)
+            parts
+                .filter { it.id == selectedId }
+                .map{
+                    function(it, cursor)
+                }
+            counter++
+        }
+        println(counter)
         closeCursor(cursor)
     }
 
@@ -182,32 +170,6 @@ object SQLExecutor {
         val query =
             "update InventoriesParts set QuantityInStore=" + part.quantityInStore + " WHERE InventoryID=" + part.inventoryId + " AND ItemID=" + part.itemId + " AND ColorID=" + part.colorId + ";"
         execWritableQuery(query)
-    }
-
-    fun getTypeCode(part: InventoryPart): String? {
-        val query = "SELECT Code FROM ItemTypes WHERE id=" + part.typeId + ";"
-        return getCodeFromQuery(query)
-    }
-
-    fun getItemCode(part: InventoryPart): String? {
-        val query = "SELECT Code FROM Parts WHERE id=" + part.itemId + ";"
-        return getCodeFromQuery(query)
-    }
-
-    fun getColorCode(part: InventoryPart): String? {
-        val query = "SELECT Code FROM Colors WHERE id=" + part.colorId + ";"
-        return getCodeFromQuery(query)
-    }
-
-    private fun getCodeFromQuery(query: String): String? {
-        val database = databaseManager.readableDatabase
-        val cursor = database.rawQuery(query, null)
-        var result: String? = null
-        if (cursor.moveToFirst()) {
-            result = cursor.getString(0)
-        }
-        closeCursor(cursor)
-        return result
     }
 
     //    ---------------------------------------------------
