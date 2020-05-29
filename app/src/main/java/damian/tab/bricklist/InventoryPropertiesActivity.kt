@@ -37,23 +37,20 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         menuBar!!.title = inventory.name
         menuBar.subtitle = "Project Name"
 
-        println(inventory.lastAccess)
-
-        //todo by nie sciagac na nowo tych czesci tylko je zapisywac w javie
         inventoryParts = SQLExecutor.getInventoryParts(inventory.id)
         SQLExecutor.supplyPartsNames(inventoryParts)
         SQLExecutor.supplyPartsColors(inventoryParts)
         SQLExecutor.supplyDesignCodesAndImages(inventoryParts)
-        inventoryParts.filter {
+
+        val invalidPartsCount = inventoryParts.filter {
             it.itemId == -1
-        }.forEach {
-            //todo naprawic partCode - obecnie jest null
-            Toast.makeText(
-                this,
-                "There is no information about brick with ItemCode: ${it.itemCode} and Color: ${it.color}",
-                Toast.LENGTH_LONG
-            ).show()
-        }
+        }.count()
+
+        Toast.makeText(
+            this,
+            "There is no information about  $invalidPartsCount  brick in database !",
+            Toast.LENGTH_LONG
+        ).show()
 
         inventoryParts = inventoryParts.filter {
             it.itemId != -1
