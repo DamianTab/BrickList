@@ -8,7 +8,6 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/properties_save_button"
-        android:icon="@android:drawable/ic_menu_save"
         android:title="Save" />
     <item
         android:id="@+id/properties_export_button"

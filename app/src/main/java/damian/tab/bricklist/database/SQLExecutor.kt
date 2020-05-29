@@ -85,7 +85,8 @@ object SQLExecutor {
     fun getInventories(showArchived: Boolean = false): List<Inventory> {
         val inventories = ArrayList<SQLParser>()
         var query = "SELECT * FROM Inventories"
-        query += if (showArchived) ";" else " WHERE ACTIVE=1;"
+        val orderBy = "ORDER BY LastAccessed DESC;"
+        query += if (showArchived) " $orderBy" else " WHERE ACTIVE=1 $orderBy"
         execReadableQuery(query, inventories, Inventory::class.java)
         return inventories as ArrayList<Inventory>
     }
@@ -93,9 +94,10 @@ object SQLExecutor {
 //    Inventory Properties Activity -------------------------------------------------
 
     fun getInventoryParts(inventoryId: Int): List<InventoryPart> {
+        val orderBy = "ORDER BY QuantityInStore - QuantityInSet ASC;"
         val inventoryParts = ArrayList<SQLParser>()
         val query =
-            "SELECT * from InventoriesParts where InventoryID = $inventoryId"
+            "SELECT * from InventoriesParts where InventoryID = $inventoryId $orderBy"
         return execReadableQuery(
             query,
             inventoryParts,

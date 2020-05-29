@@ -58,12 +58,12 @@ class InventoryPartListAdapter(
         }
 
         rowView.findViewById<Button>(R.id.plus_button).setOnClickListener {
-            changeQuantity(part, quantityTextView, position, 1)
+            changeQuantity(part, quantityTextView, rowView, position, 1)
         }
         rowView.findViewById<Button>(R.id.minus_button).setOnClickListener {
-            changeQuantity(part, quantityTextView, position, -1)
+            changeQuantity(part, quantityTextView,  rowView, position, -1)
         }
-        changeRowColor(part, quantityTextView)
+        changeRowColor(part, rowView)
         return rowView
     }
 
@@ -98,6 +98,7 @@ class InventoryPartListAdapter(
     private fun changeQuantity(
         inventoryPart: InventoryPart,
         quantityTextView: TextView,
+        view: View,
         position: Int,
         valueToAdd: Int
     ) {
@@ -107,15 +108,15 @@ class InventoryPartListAdapter(
         } else {
             inventoryParts[position].quantityInStore = inventoryPart.quantityInStore
             quantityTextView.text = generateQuantityText(inventoryPart)
-            changeRowColor(inventoryPart, quantityTextView)
+            changeRowColor(inventoryPart, view)
         }
     }
 
-    private fun changeRowColor(inventoryPart: InventoryPart, quantityTextView: TextView) {
+    private fun changeRowColor(inventoryPart: InventoryPart, view: View) {
         if (inventoryPart.quantityInSet > inventoryPart.quantityInStore) {
-            quantityTextView.setTextColor(Color.RED)
+            view.setBackgroundColor(Color.WHITE)
         } else {
-            quantityTextView.setTextColor(Color.GRAY)
+            view.setBackgroundColor(Color.LTGRAY)
         }
     }
 
