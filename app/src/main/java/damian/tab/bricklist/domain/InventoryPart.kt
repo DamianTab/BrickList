@@ -13,7 +13,6 @@ class InventoryPart : SQLParser {
     var quantityInSet: Int = -1
     var quantityInStore: Int = -1
     var colorId: Int = -1
-    var extra: Int = -1
 
     //    Extra
     var name: String? = null
@@ -21,9 +20,25 @@ class InventoryPart : SQLParser {
     var itemCode: String? = null
     var colorCode: Int? = null
     var typeCode: String? = null
+
     var designCode: Int? = null
     var image: Bitmap? = null
 
+    constructor()
+    constructor(
+        inventoryId: Int,
+        quantityInSet: Int,
+        itemCode: String?,
+        colorCode: Int?,
+        typeCode: String?
+    ) {
+        this.inventoryId = inventoryId
+        this.quantityInStore = 0
+        this.quantityInSet = quantityInSet
+        this.itemCode = itemCode
+        this.colorCode = colorCode
+        this.typeCode = typeCode
+    }
 
     override fun parse(cursor: Cursor): InventoryPart {
         this.id = cursor.getInt(0)
@@ -33,7 +48,6 @@ class InventoryPart : SQLParser {
         this.quantityInSet = cursor.getInt(4)
         this.quantityInStore = cursor.getInt(5)
         this.colorId = cursor.getInt(6)
-        this.extra = cursor.getInt(7)
         return this
     }
 }

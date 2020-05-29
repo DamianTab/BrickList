@@ -10,8 +10,6 @@ class Inventory : SQLParser, Serializable {
     var active: Int = 1
     var lastAccess: Int = 0
 
-    //todo dodac liste inventoryPart - jako optymalizacje - by nie pobierało za każdym razem
-
     constructor()
     constructor(id: Int, name: String, active: Int, date: Int) {
         this.id = id

@@ -1,21 +1,22 @@
 package damian.tab.bricklist.task
 
 import android.os.AsyncTask
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import damian.tab.bricklist.database.SQLExecutor
 import damian.tab.bricklist.domain.Inventory
+import damian.tab.bricklist.domain.InventoryPart
 import damian.tab.bricklist.getTodayDate
 import org.w3c.dom.Document
+import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 
-class DownloadXMLAsyncTask(private var context: AppCompatActivity) : AsyncTask<String, Void, Int>() {
+class DownloadXMLAsyncTask(private var context: AppCompatActivity) :
+    AsyncTask<String, Void, Int>() {
 
     override fun onPreExecute() {}
 
@@ -46,7 +47,8 @@ class DownloadXMLAsyncTask(private var context: AppCompatActivity) : AsyncTask<S
 
                 for (i in 0 until items.length) {
                     val node = items.item(i)
-                    SQLExecutor.addNewInventoryPart(node.childNodes, newInventory)
+                    val newPart = createNewInventoryPartFromXML(node.childNodes, newInventory)
+                    SQLExecutor.addNewInventoryPart(newPart)
                 }
                 return 1
             } catch (e: Exception) {
@@ -65,5 +67,15 @@ class DownloadXMLAsyncTask(private var context: AppCompatActivity) : AsyncTask<S
         }
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         if (result == 1) context.finish()
+    }
+
+    private fun createNewInventoryPartFromXML(attributes: NodeList, inventory: Inventory): InventoryPart {
+        return InventoryPart(
+            inventory.id,
+            Integer.parseInt(attributes.item(5).textContent.toString()),
+            attributes.item(3).textContent.toString().trim(),
+            Integer.parseInt(attributes.item(7).textContent.toString().trim()),
+            attributes.item(1).textContent.toString().trim()
+        )
     }
 }

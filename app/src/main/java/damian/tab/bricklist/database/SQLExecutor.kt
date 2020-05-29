@@ -10,7 +10,6 @@ import damian.tab.bricklist.domain.Inventory
 import damian.tab.bricklist.domain.InventoryPart
 import damian.tab.bricklist.domain.SQLParser
 import damian.tab.bricklist.getTodayDate
-import org.w3c.dom.NodeList
 import java.io.ByteArrayOutputStream
 
 object SQLExecutor {
@@ -43,41 +42,20 @@ object SQLExecutor {
         database.insert("Inventories", null, values)
     }
 
-    fun addNewInventoryPart(attributes: NodeList, inventory: Inventory) {
+    fun addNewInventoryPart(part: InventoryPart) {
+        supplyInventoryPartIds(part)
         val database = databaseManager.writableDatabase
         val values = ContentValues()
-        val typeId = getTypeId(attributes.item(1).textContent.toString().trim())
-        val partId = getPartId(attributes.item(3).textContent.toString().trim())
-        val colorId = getColorId(attributes.item(7).textContent.toString().trim())
-        values.put("InventoryID", inventory.id)
-        values.put("TypeID", typeId)
-        values.put("ItemID", partId)
-        values.put("QuantityInSet", Integer.parseInt(attributes.item(5).textContent.toString()))
-        values.put("ColorID", colorId)
+        values.put("InventoryID", part.inventoryId)
+        values.put("TypeID", part.typeId)
+        values.put("ItemID", part.itemId)
+        values.put("QuantityInSet", part.quantityInSet)
+        values.put("ColorID", part.colorId)
         database.insert("InventoriesParts", null, values)
     }
 
     fun getLastInventoryId(): Int {
         val query = "select max(id) from Inventories;"
-        return getIdFromQuery(query)
-    }
-
-    private fun getTypeId(code: String): Int {
-        val query = "SELECT id FROM ItemTypes WHERE code LIKE \"$code\""
-        return getIdFromQuery(query)
-    }
-
-    private fun getPartId(code: String): Int {
-        val query = "SELECT id FROM Parts WHERE code LIKE \"$code\""
-        return getIdFromQuery(query)
-    }
-
-    private fun getColorId(code: String): Int {
-        val query = "SELECT id FROM Colors WHERE code LIKE \"$code\""
-        return getIdFromQuery(query)
-    }
-
-    private fun getIdFromQuery(query: String): Int {
         val database = databaseManager.readableDatabase
         val cursor = database.rawQuery(query, null)
         var result = -1
@@ -86,6 +64,20 @@ object SQLExecutor {
         }
         closeCursor(cursor)
         return result
+    }
+
+    private fun supplyInventoryPartIds(inventoryPart: InventoryPart) {
+        val query =
+            "SELECT i.id,p.id,c.id FROM ItemTypes i INNER JOIN Parts p INNER JOIN Colors c" +
+                    " WHERE i.code LIKE \"${inventoryPart.typeCode}\" AND p.code LIKE \"${inventoryPart.itemCode}\" AND c.code LIKE \"${inventoryPart.colorCode}\""
+        val database = databaseManager.readableDatabase
+        val cursor = database.rawQuery(query, null)
+        if (cursor.moveToFirst()) {
+            inventoryPart.typeId = cursor.getInt(0)
+            inventoryPart.itemId = cursor.getInt(1)
+            inventoryPart.colorId = cursor.getInt(2)
+        }
+        closeCursor(cursor)
     }
 
 //    Main Activity -------------------------------------------------
@@ -193,17 +185,17 @@ object SQLExecutor {
     }
 
     fun getTypeCode(part: InventoryPart): String? {
-        val query = "SELECT Code FROM ItemTypes WHERE id=" + part.typeId +  ";"
+        val query = "SELECT Code FROM ItemTypes WHERE id=" + part.typeId + ";"
         return getCodeFromQuery(query)
     }
 
     fun getItemCode(part: InventoryPart): String? {
-        val query = "SELECT Code FROM Parts WHERE id=" + part.itemId +  ";"
+        val query = "SELECT Code FROM Parts WHERE id=" + part.itemId + ";"
         return getCodeFromQuery(query)
     }
 
     fun getColorCode(part: InventoryPart): String? {
-        val query = "SELECT Code FROM Colors WHERE id=" + part.colorId +  ";"
+        val query = "SELECT Code FROM Colors WHERE id=" + part.colorId + ";"
         return getCodeFromQuery(query)
     }
 
