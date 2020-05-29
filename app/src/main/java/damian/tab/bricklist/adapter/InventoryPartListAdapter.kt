@@ -48,7 +48,7 @@ class InventoryPartListAdapter(
         val imageView = rowView.findViewById(R.id.part_image) as ImageView
         val part = getItem(position)
 
-        nameTextView.text = part.name + "\n\n" + part.color
+        nameTextView.text = part.name + " [" + part.itemCode + "]\n\n" + part.color
         quantityTextView.text = generateQuantityText(part)
 
         if (part.image == null) {
