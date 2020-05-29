@@ -2,7 +2,6 @@ package damian.tab.bricklist
 
 import android.app.Activity
 import android.os.Bundle
-import android.os.Environment
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Switch
@@ -80,10 +79,14 @@ class InventoryPropertiesActivity : AppCompatActivity() {
                 save()
             }
             R.id.properties_export_button -> {
-                inventory.active=0
+                inventory.active = 0
                 save()
                 exportToXML()
-                Toast.makeText(applicationContext, "Export project to file: " + inventory.name + ".xml", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    applicationContext,
+                    "Export project to file: " + inventory.name + ".xml",
+                    Toast.LENGTH_LONG
+                ).show()
                 finish()
             }
         }
@@ -103,7 +106,6 @@ class InventoryPropertiesActivity : AppCompatActivity() {
     }
 
     private fun exportToXML() {
-        //todo eksport do XML
         val docBuilder: DocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val doc: Document = docBuilder.newDocument()
         val rootElement: Element = doc.createElement("INVENTORY")
@@ -114,23 +116,28 @@ class InventoryPropertiesActivity : AppCompatActivity() {
             val colorNode = doc.createElement("COLOR")
             val quantityNode = doc.createElement("QTYFILLED")
 
-            it.typeCode = SQLExecutor.getTypeCode(it)
-            typeNode.textContent = it.typeCode
-            itemNode.appendChild(typeNode)
+            val missingQuantity = it.quantityInSet - it.quantityInStore
+            if (missingQuantity > 0) {
+                quantityNode.textContent = missingQuantity.toString()
+                itemNode.appendChild(quantityNode)
 
-            it.itemCode = SQLExecutor.getItemCode(it)
-            idNode.textContent = it.itemCode
-            itemNode.appendChild(idNode)
+                it.typeCode = SQLExecutor.getTypeCode(it)
+                typeNode.textContent = it.typeCode
+                itemNode.appendChild(typeNode)
 
-            val colorCodeString = SQLExecutor.getColorCode(it)
-            it.colorCode = if (colorCodeString == null) null else Integer.parseInt(colorCodeString)
-            colorNode.textContent = it.colorCode.toString()
-            itemNode.appendChild(colorNode)
+                it.itemCode = SQLExecutor.getItemCode(it)
+                idNode.textContent = it.itemCode
+                itemNode.appendChild(idNode)
 
-            quantityNode.textContent = (it.quantityInSet - it.quantityInStore).toString()
-            itemNode.appendChild(quantityNode)
+                val colorCodeString = SQLExecutor.getColorCode(it)
+                it.colorCode =
+                    if (colorCodeString == null) null else Integer.parseInt(colorCodeString)
+                colorNode.textContent = it.colorCode.toString()
+                itemNode.appendChild(colorNode)
 
-            rootElement.appendChild(itemNode)
+                rootElement.appendChild(itemNode)
+            }
+
         }
         doc.appendChild(rootElement)
         val transformer: Transformer = TransformerFactory.newInstance().newTransformer()

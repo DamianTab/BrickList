@@ -82,7 +82,7 @@ object SQLExecutor {
         val cursor = database.rawQuery(query, null)
         var result = -1
         if (cursor.moveToFirst()) {
-            result = Integer.parseInt(cursor.getString(0))
+            result = cursor.getInt(0)
         }
         closeCursor(cursor)
         return result
