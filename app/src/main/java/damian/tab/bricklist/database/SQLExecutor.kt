@@ -110,7 +110,7 @@ object SQLExecutor {
     }
 
     fun supplyPartsNamesAndColors(parts: List<InventoryPart>) {
-        val lambda = { part:InventoryPart, cursor: Cursor ->
+        val lambda = { part: InventoryPart, cursor: Cursor ->
             part.name = cursor.getString(1)
             part.itemCode = cursor.getString(2)
             part.color = cursor.getString(3)
@@ -125,7 +125,7 @@ object SQLExecutor {
     }
 
     fun supplyDesignCodesAndImages(parts: List<InventoryPart>) {
-        val lambda = { part:InventoryPart, cursor: Cursor ->
+        val lambda = { part: InventoryPart, cursor: Cursor ->
             part.designCode = cursor.getInt(1)
             val blob = cursor.getBlob(2)
             if (blob != null) {
@@ -139,20 +139,19 @@ object SQLExecutor {
         supplyInventoryPartAttributes(parts, query, lambda)
     }
 
-    private fun supplyInventoryPartAttributes(parts: List<InventoryPart>, query:String, function: (InventoryPart, Cursor) -> Unit){
+    private fun supplyInventoryPartAttributes(
+        parts: List<InventoryPart>,
+        query: String,
+        function: (InventoryPart, Cursor) -> Unit
+    ) {
         val database = databaseManager.readableDatabase
         val cursor = database.rawQuery(query, null)
-        var counter = 0
         while (cursor.moveToNext()) {
             val selectedId = cursor.getInt(0)
             parts
                 .filter { it.id == selectedId }
-                .map{
-                    function(it, cursor)
-                }
-            counter++
+                .map { function(it, cursor) }
         }
-        println(counter)
         closeCursor(cursor)
     }
 

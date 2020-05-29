@@ -69,7 +69,10 @@ class DownloadXMLAsyncTask(private var context: AppCompatActivity) :
         if (result == 1) context.finish()
     }
 
-    private fun createNewInventoryPartFromXML(attributes: NodeList, inventory: Inventory): InventoryPart {
+    private fun createNewInventoryPartFromXML(
+        attributes: NodeList,
+        inventory: Inventory
+    ): InventoryPart {
         return InventoryPart(
             inventory.id,
             Integer.parseInt(attributes.item(5).textContent.toString()),

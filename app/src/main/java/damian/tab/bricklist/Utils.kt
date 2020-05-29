@@ -2,11 +2,7 @@ package damian.tab.bricklist
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
-import androidx.annotation.RequiresApi
 import damian.tab.bricklist.domain.SQLParser
-import java.text.SimpleDateFormat
-import java.util.*
 
 // Main
 const val REQUEST_CODE = 1000
@@ -46,7 +42,7 @@ fun getTodayDate(): Int {
     return (System.currentTimeMillis() / 1000).toInt()
 }
 
-open class Factory<T: SQLParser>(private val type: Class<T>) {
+open class Factory<T : SQLParser>(private val type: Class<T>) {
     val name: String
         get() = type.name
 

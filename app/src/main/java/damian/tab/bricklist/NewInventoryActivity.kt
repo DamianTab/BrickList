@@ -28,7 +28,7 @@ class NewInventoryActivity : AppCompatActivity() {
     }
 
     override fun finish() {
-        setResult(Activity.RESULT_OK,intent)
+        setResult(Activity.RESULT_OK, intent)
         super.finish()
     }
 

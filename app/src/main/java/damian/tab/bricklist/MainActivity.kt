@@ -5,7 +5,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import damian.tab.bricklist.adapter.InventoryListAdapter
@@ -46,7 +47,6 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if ((requestCode == REQUEST_CODE) && (resultCode == Activity.RESULT_OK)) updateList()
-        println("---------------------onActivityResult")
     }
 
     private fun updateList() {
