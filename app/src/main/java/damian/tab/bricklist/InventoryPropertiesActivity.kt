@@ -44,14 +44,17 @@ class InventoryPropertiesActivity : AppCompatActivity() {
             it.itemId == -1
         }.count()
 
-        Toast.makeText(
-            this,
-            "There is no information about  $invalidPartsCount  brick in database !",
-            Toast.LENGTH_LONG
-        ).show()
-        inventoryParts = inventoryParts.filter {
-            it.itemId != -1
+        if (invalidPartsCount > 0) {
+            Toast.makeText(
+                this,
+                "There is no information about  $invalidPartsCount  brick in database !",
+                Toast.LENGTH_LONG
+            ).show()
+            inventoryParts = inventoryParts.filter {
+                it.itemId != -1
+            }
         }
+
         inventory_part_list.adapter = InventoryPartListAdapter(this, inventoryParts)
     }
 
@@ -96,6 +99,11 @@ class InventoryPropertiesActivity : AppCompatActivity() {
         inventoryParts.forEach {
             SQLExecutor.updateInventoryPart(it)
         }
+        Toast.makeText(
+            applicationContext,
+            "Project saved.",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun exportToXML() {
